@@ -609,19 +609,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
 
 /* Metrics bar in Mi Trabajo */
 .mt-metric {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 10px 16px;
+  display: flex; flex-direction: row; align-items: center; justify-content: center;
+  padding: 10px 14px;
   background: var(--bg-0);
   cursor: pointer;
-  gap: 2px;
+  gap: 6px;
   flex: 1;
   border-right: 1px solid var(--border);
   transition: background 0.1s;
 }
 .mt-metric:hover { background: var(--bg-1); }
-.mt-metric-val { font-size: 18px; font-weight: 700; line-height: 1; }
-.mt-metric-lbl { font-size: 10px; color: var(--txt-2); white-space: nowrap; }
-.mt-metric-trend { font-size: 11px; font-weight: 700; line-height: 1; }
+.mt-metric-val { font-size: 15px; font-weight: 700; line-height: 1; white-space: nowrap; }
+.mt-metric-lbl { font-size: 11px; color: var(--txt-2); white-space: nowrap; }
+.mt-metric-trend { font-size: 12px; font-weight: 700; line-height: 1; }
 
 /* Knowledge block icon (plain, no background) */
 .know-block-icon-plain {
@@ -2742,22 +2742,17 @@ function filterKnowledge(query) {
 
 // ── Initial state: show Elena role ──────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Show Elena's content by default
   document.querySelectorAll('[data-role]').forEach(el => {
-    el.style.display = el.dataset.role === 'elena' ? 'block' : 'none';
+    const isMatch = el.dataset.role === 'elena';
+    const isMetricChild = el.closest('#mt-metrics-bar');
+    if (isMetricChild) {
+      el.style.display = isMatch ? 'flex' : 'none';
+      el.style.flexDirection = 'row';
+    } else {
+      el.style.display = isMatch ? 'block' : 'none';
+    }
   });
 });
-
-// Also run immediately for non-DOMContentLoaded contexts
-(function() {
-  setTimeout(() => {
-    document.querySelectorAll('[data-role]').forEach(el => {
-      if (el.style.display === '') {
-        el.style.display = el.dataset.role === 'elena' ? 'block' : 'none';
-      }
-    });
-  }, 50);
-})();
 </script>
 </body>
 </html>
