@@ -653,31 +653,31 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
 
 /* Knowledge block index */
 .kb-index-item {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 10px 8px;
+  display: flex; flex-direction: row; align-items: center; gap: 7px;
+  padding: 8px 10px;
   background: var(--bg-0);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   cursor: pointer;
   position: relative;
   transition: border-color 0.15s, background 0.15s;
-  text-align: center;
 }
 .kb-index-item:hover { background: var(--bg-1); border-color: var(--blue-mid); }
 .kb-index-item.active { border-color: var(--blue); background: var(--blue-lt); }
 .kb-index-item.active .kb-index-name { color: var(--blue); font-weight: 600; }
-.kb-index-icon-plain { font-size: 18px; line-height: 1; }
+.kb-index-icon-plain { font-size: 16px; line-height: 1; flex-shrink: 0; }
 .kb-index-name {
-  font-size: 11px; font-weight: 500;
+  font-size: 12px; font-weight: 500;
   color: var(--txt-0);
   line-height: 1.3;
+  flex: 1;
 }
 .kb-index-badge {
-  position: absolute; top: 5px; right: 5px;
   font-size: 10px; font-weight: 600;
   padding: 1px 5px;
   border-radius: 8px;
   line-height: 1.4;
+  flex-shrink: 0;
 }
 .know-block.highlighted {
   animation: highlight-block 1.2s ease-out forwards;
@@ -1409,7 +1409,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
       </div>
 
       <!-- Block index -->
-      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px" id="kb-index">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px" id="kb-index">
         <div class="kb-index-item active" onclick="selectBlock('todos',this)">
           <span class="kb-index-icon-plain">◻️</span>
           <span class="kb-index-name">Todos</span>
@@ -1446,7 +1446,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
       <div id="know-view-index">
 
         <!-- Nueva entrada clasificando -->
-        <div class="card" style="border-color:var(--purple);border-style:dashed;margin-bottom:16px;padding:12px 16px">
+        <div class="card" style="border-color:var(--purple);border-style:dashed;margin-bottom:12px;padding:10px 14px">
           <div style="display:flex;align-items:center;gap:10px">
             <span class="tag tag-purple" style="animation:pulse 1.5s infinite">🤖 Clasificando…</span>
             <div style="font-size:13px;color:var(--txt-1)">
@@ -2501,6 +2501,7 @@ function selectBlock(id, btn) {
   const allBlocks = document.querySelectorAll('.know-block');
 
   if (id === 'todos') {
+    // Show all blocks, all collapsed
     allBlocks.forEach(b => {
       b.style.display = 'block';
       const body = b.querySelector('.know-block-body');
@@ -2511,7 +2512,16 @@ function selectBlock(id, btn) {
       if (desc) desc.style.display = 'none';
     });
   } else {
-    allBlocks.forEach(b => { b.style.display = 'none'; });
+    // Hide all, show only selected — open it
+    allBlocks.forEach(b => {
+      b.style.display = 'none';
+      const body = b.querySelector('.know-block-body');
+      const arrow = b.querySelector('.kb-arrow');
+      const desc = b.querySelector('.know-block-desc');
+      if (body) body.classList.remove('open');
+      if (arrow) arrow.textContent = '▶';
+      if (desc) desc.style.display = 'none';
+    });
     const target = document.getElementById(id);
     if (target) {
       target.style.display = 'block';
