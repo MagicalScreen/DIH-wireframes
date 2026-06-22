@@ -605,6 +605,48 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
 .empty-state .empty-icon { font-size: 36px; margin-bottom: 12px; }
 .empty-state p { font-size: 13px; }
 
+/* Knowledge blocks */
+.know-block {
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.know-block-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+}
+.know-block-head:hover { background: var(--bg-1); }
+.know-block-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.know-block-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.know-block-desc { font-size: 12px; color: var(--txt-2); }
+.know-block-count { font-size: 12px; color: var(--txt-2); white-space: nowrap; }
+.know-block-body {
+  display: none;
+  border-top: 1px solid var(--border);
+}
+.know-block-body.open { display: block; }
+.know-block-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--bg-2);
+  border-left: 3px solid transparent;
+}
+.know-block-item:last-child { border-bottom: none; }
+.know-block-item:hover { background: var(--bg-1); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 /* Workflow items */
 .workflow-item {
   display: flex; align-items: center; gap: 12px;
@@ -1318,91 +1360,339 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
     <!-- ════════════════════════════════════════════════ -->
     <div id="screen-conocimiento" class="screen">
       <div class="page-title">Base de conocimiento</div>
-      <div class="page-sub">Decisiones y notas técnicas del equipo · RAG activo</div>
+      <div class="page-sub">Índice de bloques temáticos generado por el LLM · RAG activo</div>
 
       <div class="filter-bar">
-        <input class="search-input" placeholder="¿Por qué usamos border-radius de 6px?…" style="max-width:320px">
-        <span class="filter-chip active">Explorar</span>
-        <span class="filter-chip">Preguntar</span>
+        <input class="search-input" placeholder="¿Por qué usamos border-radius de 6px?…" style="max-width:320px" id="know-search" oninput="filterKnowledge(this.value)">
+        <span class="filter-chip active" onclick="switchKnowView('index',this)">Índice</span>
+        <span class="filter-chip" onclick="switchKnowView('preguntar',this)">Preguntar</span>
+        <span class="filter-chip" onclick="switchKnowView('recientes',this)">Recientes</span>
         <span class="filter-chip">Estado ▾</span>
         <span class="filter-chip">Proyecto ▾</span>
+        <button class="btn btn-primary btn-s" style="margin-left:auto">+ Añadir entrada</button>
       </div>
 
-      <!-- RAG answer card -->
-      <div class="card" style="border-color:var(--purple);margin-bottom:16px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span class="tag tag-purple">🤖 Respuesta RAG</span>
-          <span class="meta">Basada en 4 fuentes</span>
+      <!-- Stats row -->
+      <div class="grid-3" style="margin-bottom:16px">
+        <div class="stat-card">
+          <div class="stat-number">24</div>
+          <div class="stat-label">Entradas totales</div>
+          <div class="stat-trend trend-up">↑ 3 esta semana</div>
         </div>
-        <div style="font-size:13px;line-height:1.6;color:var(--txt-0)">
-          El border-radius de 6px fue decidido en el sprint 9 tras la retrospectiva de accesibilidad. Elena propuso 4px pero se acordó 6px para mejorar la percepción de los elementos interactivos en mobile. La decisión está vinculada a los tokens de forma del design system v1.2.
+        <div class="stat-card">
+          <div class="stat-number">6</div>
+          <div class="stat-label">Bloques temáticos</div>
+          <div class="stat-trend" style="color:var(--purple)">🤖 generados por LLM</div>
         </div>
-        <div style="margin-top:10px;display:flex;gap:8px">
-          <span class="frame-ref">📎 Decisión · Sprint 9</span>
-          <span class="frame-ref">📎 DS Tokens v1.2</span>
-          <span class="frame-ref">📎 Retro accesibilidad</span>
-        </div>
-      </div>
-
-      <div style="font-weight:600;font-size:12px;color:var(--txt-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">ENTRADAS RECIENTES</div>
-
-      <div class="card" style="padding:0;overflow:hidden">
-        <div class="know-item">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between">
-            <div class="know-item-title">Border-radius · Tokens de forma</div>
-            <button class="btn btn-secondary btn-xs">Ver</button>
-          </div>
-          <div class="row" style="margin-top:4px;justify-content:space-between">
-            <div class="row" style="gap:8px">
-              <span class="know-state state-activa">● ACTIVA</span>
-              <span class="tag tag-gray">Decisión</span>
-            </div>
-            <span class="meta">Sprint 9 · Elena García</span>
-          </div>
-        </div>
-        <div class="know-item">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between">
-            <div class="know-item-title">Animaciones micro-interacción carrito — v2</div>
-            <button class="btn btn-secondary btn-xs">Ver</button>
-          </div>
-          <div class="row" style="margin-top:4px;justify-content:space-between">
-            <div class="row" style="gap:8px">
-              <span class="know-state state-activa">● ACTIVA</span>
-              <span class="tag tag-gray">Nota técnica</span>
-            </div>
-            <span class="meta">Sprint 11 · Priya Sharma</span>
-          </div>
-        </div>
-        <div class="know-item">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between">
-            <div class="know-item-title">Especificaciones carrito — sprint 11</div>
-            <button class="btn btn-secondary btn-xs">Ver</button>
-          </div>
-          <div class="row" style="margin-top:4px;justify-content:space-between">
-            <div class="row" style="gap:8px">
-              <span class="know-state state-reemplazada">● REEMPLAZADA</span>
-              <span class="tag tag-gray">Nota técnica</span>
-            </div>
-            <span class="meta">Sprint 10 · Leo Torres</span>
-          </div>
-        </div>
-        <div class="know-item">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between">
-            <div class="know-item-title">Tokens tipografía — escala móvil</div>
-            <button class="btn btn-secondary btn-xs">Ver</button>
-          </div>
-          <div class="row" style="margin-top:4px;justify-content:space-between">
-            <div class="row" style="gap:8px">
-              <span class="know-state state-conflicto">● EN CONFLICTO</span>
-              <span class="tag tag-gray">Decisión</span>
-            </div>
-            <span class="meta">Sprint 12 · Nora Bello</span>
-          </div>
+        <div class="stat-card">
+          <div class="stat-number">1</div>
+          <div class="stat-label">En conflicto</div>
+          <div class="stat-trend trend-dn" style="color:var(--red)">Requiere resolución</div>
         </div>
       </div>
 
-      <div style="font-size:11px;color:var(--txt-2);margin-top:10px;background:var(--bg-1);padding:8px 12px;border-radius:var(--radius)">
-        🔒 Solo Elena y Leo pueden cambiar el estado de las entradas. El resto puede proponer cambios mediante comentarios.
+      <!-- VIEW: INDEX (default) -->
+      <div id="know-view-index">
+
+        <!-- Nueva entrada clasificando -->
+        <div class="card" style="border-color:var(--purple);border-style:dashed;margin-bottom:16px;padding:12px 16px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="tag tag-purple" style="animation:pulse 1.5s infinite">🤖 Clasificando…</span>
+            <div style="font-size:13px;color:var(--txt-1)">
+              <strong style="color:var(--txt-0)">"Decisión de contraste WCAG — botones de acción"</strong>
+              — añadida por Elena hace 5 min · El LLM está determinando el bloque
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 1: Sistema de Diseño -->
+        <div class="know-block" id="kb-ds">
+          <div class="know-block-head" onclick="toggleKnowBlock('kb-ds')">
+            <div class="know-block-icon" style="background:var(--blue-lt);color:var(--blue)">🎨</div>
+            <div style="flex:1">
+              <div class="know-block-title">Sistema de Diseño</div>
+              <div class="know-block-desc">Tokens, componentes, decisiones de estilo y guías visuales</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="know-block-count">8 entradas</span>
+              <span class="know-state state-activa" style="font-size:10px">7 activas</span>
+              <span style="color:var(--txt-2);font-size:12px" class="kb-arrow">▼</span>
+            </div>
+          </div>
+          <div class="know-block-body open">
+            <div class="know-block-item" style="border-left-color:var(--green)">
+              <div style="flex:1">
+                <div class="know-item-title">Border-radius · Tokens de forma</div>
+                <div class="meta-row">
+                  <span class="know-state state-activa">● ACTIVA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Decisión</span>
+                  <span class="meta">Sprint 9 · Elena</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+            <div class="know-block-item" style="border-left-color:var(--red)">
+              <div style="flex:1">
+                <div class="know-item-title">Tokens tipografía — escala móvil</div>
+                <div class="meta-row">
+                  <span class="know-state state-conflicto">● EN CONFLICTO</span>
+                  <span class="tag tag-gray" style="font-size:10px">Decisión</span>
+                  <span class="meta">Sprint 12 · Nora</span>
+                </div>
+                <div class="alert alert-red" style="margin:6px 0 0;padding:6px 10px;font-size:11px">
+                  ⚠ Conflicto: Nora propone escala 14/12 · Elena mantiene 16/13. Pendiente resolución.
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+            <div class="know-block-item" style="border-left-color:var(--green)">
+              <div style="flex:1">
+                <div class="know-item-title">Paleta de colores v1.3 · Modo claro</div>
+                <div class="meta-row">
+                  <span class="know-state state-activa">● ACTIVA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Decisión</span>
+                  <span class="meta">Sprint 10 · Elena</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+            <div style="padding:8px 12px">
+              <span style="font-size:12px;color:var(--blue);cursor:pointer">Ver 5 entradas más →</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 2: Proceso de entrega -->
+        <div class="know-block" id="kb-proc">
+          <div class="know-block-head" onclick="toggleKnowBlock('kb-proc')">
+            <div class="know-block-icon" style="background:var(--green-lt);color:var(--green)">⚙️</div>
+            <div style="flex:1">
+              <div class="know-block-title">Proceso de entrega</div>
+              <div class="know-block-desc">Handoff, revisiones, criterios de aceptación y flujos de trabajo</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="know-block-count">5 entradas</span>
+              <span class="know-state state-activa" style="font-size:10px">5 activas</span>
+              <span style="color:var(--txt-2);font-size:12px" class="kb-arrow">▶</span>
+            </div>
+          </div>
+          <div class="know-block-body">
+            <div class="know-block-item" style="border-left-color:var(--green)">
+              <div style="flex:1">
+                <div class="know-item-title">Checklist de handoff — v2</div>
+                <div class="meta-row">
+                  <span class="know-state state-activa">● ACTIVA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Proceso</span>
+                  <span class="meta">Sprint 11 · Elena</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+            <div class="know-block-item" style="border-left-color:var(--txt-2)">
+              <div style="flex:1">
+                <div class="know-item-title">Criterios Silent Crit — v1</div>
+                <div class="meta-row">
+                  <span class="know-state state-reemplazada">● REEMPLAZADA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Proceso</span>
+                  <span class="meta">Sprint 8 · Elena</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+            <div style="padding:8px 12px">
+              <span style="font-size:12px;color:var(--blue);cursor:pointer">Ver 3 entradas más →</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 3: Interacción y motion -->
+        <div class="know-block" id="kb-motion">
+          <div class="know-block-head" onclick="toggleKnowBlock('kb-motion')">
+            <div class="know-block-icon" style="background:var(--purple-lt);color:var(--purple)">✨</div>
+            <div style="flex:1">
+              <div class="know-block-title">Interacción y motion</div>
+              <div class="know-block-desc">Animaciones, micro-interacciones, transiciones y comportamientos</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="know-block-count">4 entradas</span>
+              <span class="know-state state-activa" style="font-size:10px">3 activas</span>
+              <span style="color:var(--txt-2);font-size:12px" class="kb-arrow">▶</span>
+            </div>
+          </div>
+          <div class="know-block-body">
+            <div class="know-block-item" style="border-left-color:var(--green)">
+              <div style="flex:1">
+                <div class="know-item-title">Animaciones micro-interacción carrito — v2</div>
+                <div class="meta-row">
+                  <span class="know-state state-activa">● ACTIVA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Nota técnica</span>
+                  <span class="meta">Sprint 11 · Priya</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+            <div class="know-block-item" style="border-left-color:var(--txt-2)">
+              <div style="flex:1">
+                <div class="know-item-title">Especificaciones carrito — sprint 11</div>
+                <div class="meta-row">
+                  <span class="know-state state-reemplazada">● REEMPLAZADA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Nota técnica</span>
+                  <span class="meta">Sprint 10 · Leo</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 4: Accesibilidad -->
+        <div class="know-block" id="kb-a11y">
+          <div class="know-block-head" onclick="toggleKnowBlock('kb-a11y')">
+            <div class="know-block-icon" style="background:var(--amber-lt);color:var(--amber)">♿</div>
+            <div style="flex:1">
+              <div class="know-block-title">Accesibilidad</div>
+              <div class="know-block-desc">WCAG, ratios de contraste, navegación por teclado y lectores de pantalla</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="know-block-count">4 entradas</span>
+              <span class="know-state state-activa" style="font-size:10px">4 activas</span>
+              <span style="color:var(--txt-2);font-size:12px" class="kb-arrow">▶</span>
+            </div>
+          </div>
+          <div class="know-block-body">
+            <div class="know-block-item" style="border-left-color:var(--green)">
+              <div style="flex:1">
+                <div class="know-item-title">Ratio de contraste mínimo — botones de acción</div>
+                <div class="meta-row">
+                  <span class="know-state state-activa">● ACTIVA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Decisión</span>
+                  <span class="meta">Sprint 9 · Elena</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 5: Producto y estrategia -->
+        <div class="know-block" id="kb-prod">
+          <div class="know-block-head" onclick="toggleKnowBlock('kb-prod')">
+            <div class="know-block-icon" style="background:var(--orange-lt);color:var(--orange)">🎯</div>
+            <div style="flex:1">
+              <div class="know-block-title">Producto y estrategia</div>
+              <div class="know-block-desc">Decisiones de producto, scope de features y criterios de aceptación</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="know-block-count">2 entradas</span>
+              <span class="know-state state-activa" style="font-size:10px">2 activas</span>
+              <span style="color:var(--txt-2);font-size:12px" class="kb-arrow">▶</span>
+            </div>
+          </div>
+          <div class="know-block-body">
+            <div class="know-block-item" style="border-left-color:var(--green)">
+              <div style="flex:1">
+                <div class="know-item-title">Scope Checkout v3 — sprint 12</div>
+                <div class="meta-row">
+                  <span class="know-state state-activa">● ACTIVA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Decisión</span>
+                  <span class="meta">Sprint 12 · Nora</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 6: Sin clasificar -->
+        <div class="know-block" id="kb-uncat" style="border-style:dashed">
+          <div class="know-block-head" onclick="toggleKnowBlock('kb-uncat')">
+            <div class="know-block-icon" style="background:var(--bg-2);color:var(--txt-2)">❓</div>
+            <div style="flex:1">
+              <div class="know-block-title" style="color:var(--txt-1)">Sin clasificar</div>
+              <div class="know-block-desc">Entradas recientes pendientes de revisión por el LLM</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="know-block-count">1 entrada</span>
+              <span class="tag tag-purple" style="font-size:10px">🤖 Procesando</span>
+              <span style="color:var(--txt-2);font-size:12px" class="kb-arrow">▶</span>
+            </div>
+          </div>
+          <div class="know-block-body">
+            <div class="know-block-item" style="border-left-color:var(--purple);opacity:0.7">
+              <div style="flex:1">
+                <div class="know-item-title">Decisión de contraste WCAG — botones de acción</div>
+                <div class="meta-row">
+                  <span class="tag tag-purple" style="font-size:10px">🤖 Clasificando…</span>
+                  <span class="meta">hace 5 min · Elena</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;color:var(--txt-2);margin-top:12px;background:var(--bg-1);padding:8px 12px;border-radius:var(--radius)">
+          🔒 Solo Elena y Leo pueden cambiar el estado de las entradas. El resto puede proponer cambios. · 🤖 El LLM reclasifica automáticamente cuando detecta patrones nuevos.
+        </div>
+      </div>
+
+      <!-- VIEW: PREGUNTAR -->
+      <div id="know-view-preguntar" style="display:none">
+        <div class="card" style="border-color:var(--purple);margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span class="tag tag-purple">🤖 Respuesta RAG</span>
+            <span class="meta">Basada en 4 fuentes</span>
+          </div>
+          <div style="font-size:13px;line-height:1.6">
+            El border-radius de 6px fue decidido en el sprint 9 tras la retrospectiva de accesibilidad. Elena propuso 4px pero se acordó 6px para mejorar la percepción de los elementos interactivos en mobile.
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px">
+            <span class="frame-ref">📎 Decisión · Sprint 9</span>
+            <span class="frame-ref">📎 DS Tokens v1.2</span>
+            <span class="frame-ref">📎 Retro accesibilidad</span>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--txt-2);text-align:center">Usa ⌘K para hacer una nueva pregunta</div>
+      </div>
+
+      <!-- VIEW: RECIENTES -->
+      <div id="know-view-recientes" style="display:none">
+        <div class="card" style="padding:0;overflow:hidden">
+          <div class="know-item">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;width:100%">
+              <div>
+                <div class="know-item-title">Decisión de contraste WCAG — botones de acción</div>
+                <div class="meta-row"><span class="tag tag-purple" style="font-size:10px">🤖 Clasificando</span><span class="meta">hace 5 min · Elena</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="know-item">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;width:100%">
+              <div>
+                <div class="know-item-title">Tokens tipografía — escala móvil</div>
+                <div class="meta-row"><span class="know-state state-conflicto">● EN CONFLICTO</span><span class="tag tag-gray" style="font-size:10px">Decisión</span><span class="meta">Sprint 12 · Nora</span></div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+          </div>
+          <div class="know-item">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;width:100%">
+              <div>
+                <div class="know-item-title">Animaciones micro-interacción carrito — v2</div>
+                <div class="meta-row"><span class="know-state state-activa">● ACTIVA</span><span class="tag tag-gray" style="font-size:10px">Nota técnica</span><span class="meta">Sprint 11 · Priya</span></div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+          </div>
+          <div class="know-item">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;width:100%">
+              <div>
+                <div class="know-item-title">Border-radius · Tokens de forma</div>
+                <div class="meta-row"><span class="know-state state-activa">● ACTIVA</span><span class="tag tag-gray" style="font-size:10px">Decisión</span><span class="meta">Sprint 9 · Elena</span></div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2149,6 +2439,44 @@ function toggleAudit(btn) {
 function showProject(name) {
   document.querySelectorAll('.panel-left .list-item').forEach(i => i.classList.remove('selected'));
   event.currentTarget.classList.add('selected');
+}
+
+// ── Knowledge block toggle ───────────────────────────────
+function toggleKnowBlock(id) {
+  const block = document.getElementById(id);
+  const body = block.querySelector('.know-block-body');
+  const arrow = block.querySelector('.kb-arrow');
+  body.classList.toggle('open');
+  arrow.textContent = body.classList.contains('open') ? '▼' : '▶';
+}
+
+// ── Knowledge view switch ────────────────────────────────
+function switchKnowView(view, btn) {
+  document.querySelectorAll('#screen-conocimiento .filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('know-view-index').style.display = view === 'index' ? 'block' : 'none';
+  document.getElementById('know-view-preguntar').style.display = view === 'preguntar' ? 'block' : 'none';
+  document.getElementById('know-view-recientes').style.display = view === 'recientes' ? 'block' : 'none';
+}
+
+// ── Knowledge search ─────────────────────────────────────
+function filterKnowledge(query) {
+  if (!query) {
+    document.querySelectorAll('.know-block-item').forEach(i => i.style.display = '');
+    return;
+  }
+  const q = query.toLowerCase();
+  document.querySelectorAll('.know-block-item').forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(q) ? '' : 'none';
+  });
+  // Auto-open blocks with matches
+  document.querySelectorAll('.know-block').forEach(block => {
+    const visible = Array.from(block.querySelectorAll('.know-block-item')).some(i => i.style.display !== 'none');
+    const body = block.querySelector('.know-block-body');
+    const arrow = block.querySelector('.kb-arrow');
+    if (visible && body) { body.classList.add('open'); if(arrow) arrow.textContent = '▼'; }
+  });
 }
 
 // ── Initial state: show Elena role ──────────────────────
