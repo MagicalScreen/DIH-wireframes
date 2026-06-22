@@ -1459,10 +1459,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
         <!-- Block 1: Sistema de Diseño -->
         <div class="know-block" id="kb-ds">
           <div class="know-block-head" onclick="toggleKnowBlock('kb-ds')">
-            <div class="know-block-icon" style="background:var(--blue-lt);color:var(--blue)">🎨</div>
+            <div class="know-block-icon-plain" style="font-size:20px">🎨</div>
             <div style="flex:1">
               <div class="know-block-title">Sistema de Diseño</div>
-              <div class="know-block-desc">Tokens, componentes, decisiones de estilo y guías visuales</div>
+              <div class="know-block-desc" style="display:none">Tokens, componentes, decisiones de estilo y guías visuales</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px">
               <span class="know-block-count">8 entradas</span>
@@ -1516,10 +1516,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
         <!-- Block 2: Proceso de entrega -->
         <div class="know-block" id="kb-proc">
           <div class="know-block-head" onclick="toggleKnowBlock('kb-proc')">
-            <div class="know-block-icon" style="background:var(--green-lt);color:var(--green)">⚙️</div>
+            <div class="know-block-icon-plain" style="font-size:20px">⚙️</div>
             <div style="flex:1">
               <div class="know-block-title">Proceso de entrega</div>
-              <div class="know-block-desc">Handoff, revisiones, criterios de aceptación y flujos de trabajo</div>
+              <div class="know-block-desc" style="display:none">Handoff, revisiones, criterios de aceptación y flujos de trabajo</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px">
               <span class="know-block-count">5 entradas</span>
@@ -1559,10 +1559,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
         <!-- Block 3: Interacción y motion -->
         <div class="know-block" id="kb-motion">
           <div class="know-block-head" onclick="toggleKnowBlock('kb-motion')">
-            <div class="know-block-icon" style="background:var(--purple-lt);color:var(--purple)">✨</div>
+            <div class="know-block-icon-plain" style="font-size:20px">✨</div>
             <div style="flex:1">
               <div class="know-block-title">Interacción y motion</div>
-              <div class="know-block-desc">Animaciones, micro-interacciones, transiciones y comportamientos</div>
+              <div class="know-block-desc" style="display:none">Animaciones, micro-interacciones, transiciones y comportamientos</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px">
               <span class="know-block-count">4 entradas</span>
@@ -1599,10 +1599,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
         <!-- Block 4: Accesibilidad -->
         <div class="know-block" id="kb-a11y">
           <div class="know-block-head" onclick="toggleKnowBlock('kb-a11y')">
-            <div class="know-block-icon" style="background:var(--amber-lt);color:var(--amber)">♿</div>
+            <div class="know-block-icon-plain" style="font-size:20px">♿</div>
             <div style="flex:1">
               <div class="know-block-title">Accesibilidad</div>
-              <div class="know-block-desc">WCAG, ratios de contraste, navegación por teclado y lectores de pantalla</div>
+              <div class="know-block-desc" style="display:none">WCAG, ratios de contraste, navegación por teclado y lectores de pantalla</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px">
               <span class="know-block-count">4 entradas</span>
@@ -1628,10 +1628,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
         <!-- Block 5: Producto y estrategia -->
         <div class="know-block" id="kb-prod">
           <div class="know-block-head" onclick="toggleKnowBlock('kb-prod')">
-            <div class="know-block-icon" style="background:var(--orange-lt);color:var(--orange)">🎯</div>
+            <div class="know-block-icon-plain" style="font-size:20px">🎯</div>
             <div style="flex:1">
               <div class="know-block-title">Producto y estrategia</div>
-              <div class="know-block-desc">Decisiones de producto, scope de features y criterios de aceptación</div>
+              <div class="know-block-desc" style="display:none">Decisiones de producto, scope de features y criterios de aceptación</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px">
               <span class="know-block-count">2 entradas</span>
@@ -1657,10 +1657,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
         <!-- Block 6: Sin clasificar -->
         <div class="know-block" id="kb-uncat" style="border-style:dashed">
           <div class="know-block-head" onclick="toggleKnowBlock('kb-uncat')">
-            <div class="know-block-icon" style="background:var(--bg-2);color:var(--txt-2)">❓</div>
+            <div class="know-block-icon-plain" style="font-size:20px;opacity:.5">❓</div>
             <div style="flex:1">
               <div class="know-block-title" style="color:var(--txt-1)">Sin clasificar</div>
-              <div class="know-block-desc">Entradas recientes pendientes de revisión por el LLM</div>
+              <div class="know-block-desc" style="display:none">Entradas recientes pendientes de revisión por el LLM</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px">
               <span class="know-block-count">1 entrada</span>
@@ -2501,24 +2501,26 @@ function selectBlock(id, btn) {
   const allBlocks = document.querySelectorAll('.know-block');
 
   if (id === 'todos') {
-    // Show all, collapsed
     allBlocks.forEach(b => {
       b.style.display = 'block';
       const body = b.querySelector('.know-block-body');
       const arrow = b.querySelector('.kb-arrow');
+      const desc = b.querySelector('.know-block-desc');
       if (body) body.classList.remove('open');
       if (arrow) arrow.textContent = '▶';
+      if (desc) desc.style.display = 'none';
     });
   } else {
-    // Hide all, show only selected — open it
     allBlocks.forEach(b => { b.style.display = 'none'; });
     const target = document.getElementById(id);
     if (target) {
       target.style.display = 'block';
       const body = target.querySelector('.know-block-body');
       const arrow = target.querySelector('.kb-arrow');
+      const desc = target.querySelector('.know-block-desc');
       if (body) body.classList.add('open');
       if (arrow) arrow.textContent = '▼';
+      if (desc) desc.style.display = 'block';
     }
   }
 }
@@ -2528,8 +2530,11 @@ function toggleKnowBlock(id) {
   const block = document.getElementById(id);
   const body = block.querySelector('.know-block-body');
   const arrow = block.querySelector('.kb-arrow');
+  const desc = block.querySelector('.know-block-desc');
   body.classList.toggle('open');
-  arrow.textContent = body.classList.contains('open') ? '▼' : '▶';
+  const isOpen = body.classList.contains('open');
+  arrow.textContent = isOpen ? '▼' : '▶';
+  if (desc) desc.style.display = isOpen ? 'block' : 'none';
 }
 
 // ── Knowledge view switch ────────────────────────────────
