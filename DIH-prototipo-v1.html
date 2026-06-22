@@ -1372,23 +1372,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
         <button class="btn btn-primary btn-s" style="margin-left:auto">+ Añadir entrada</button>
       </div>
 
-      <!-- Stats row -->
-      <div class="grid-3" style="margin-bottom:16px">
-        <div class="stat-card">
-          <div class="stat-number">24</div>
-          <div class="stat-label">Entradas totales</div>
-          <div class="stat-trend trend-up">↑ 3 esta semana</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">6</div>
-          <div class="stat-label">Bloques temáticos</div>
-          <div class="stat-trend" style="color:var(--purple)">🤖 generados por LLM</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">1</div>
-          <div class="stat-label">En conflicto</div>
-          <div class="stat-trend trend-dn" style="color:var(--red)">Requiere resolución</div>
-        </div>
+      <!-- Conflict notice -->
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--red-lt);border:1px solid #fca5a5;border-radius:var(--radius);margin-bottom:14px;font-size:12px;color:var(--red)">
+        <span>⚠</span>
+        <span><strong>1 entrada en conflicto</strong> — Tokens tipografía · escala móvil</span>
+        <button onclick="toggleKnowBlock('kb-ds');document.getElementById('kb-ds').scrollIntoView({behavior:'smooth'})" class="btn btn-xs" style="margin-left:auto;background:var(--red);color:#fff;border:none">Ver →</button>
       </div>
 
       <!-- VIEW: INDEX (default) -->
