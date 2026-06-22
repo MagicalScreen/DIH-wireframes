@@ -1,0 +1,2605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Intelligence Hub — Prototipo v1.3</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<style>
+/* ── TOKENS ─────────────────────────────────────────── */
+:root {
+  --bg-0: #ffffff;
+  --bg-1: #f5f5f5;
+  --bg-2: #eeeeee;
+  --bg-3: #e0e0e0;
+  --txt-0: #111111;
+  --txt-1: #555555;
+  --txt-2: #999999;
+  --border: #e0e0e0;
+  --blue: #1d4ed8;
+  --blue-lt: #dbeafe;
+  --blue-mid: #3b82f6;
+  --green: #16a34a;
+  --green-lt: #dcfce7;
+  --amber: #b45309;
+  --amber-lt: #fef3c7;
+  --red: #dc2626;
+  --red-lt: #fee2e2;
+  --purple: #7c3aed;
+  --purple-lt: #ede9fe;
+  --orange: #ea580c;
+  --orange-lt: #ffedd5;
+  --radius: 6px;
+  --sidebar-w: 196px;
+  --header-h: 52px;
+}
+
+/* ── RESET ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font-size: 13px; color: var(--txt-0); background: var(--bg-2); display: flex; height: 100vh; overflow: hidden; }
+
+/* ── SIDEBAR ─────────────────────────────────────────── */
+#sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg-0);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  height: 100vh;
+}
+.sb-logo {
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.sb-logo .logo-mark {
+  width: 28px; height: 28px;
+  background: var(--blue);
+  border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: 13px;
+  margin-right: 8px;
+}
+.sb-logo span { font-weight: 600; font-size: 13px; }
+.sb-logo small { display: block; color: var(--txt-2); font-size: 10px; margin-top: 1px; }
+
+.sb-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 0;
+  color: var(--txt-1);
+  font-size: 13px;
+  transition: background 0.1s;
+  position: relative;
+}
+.nav-item:hover { background: var(--bg-1); color: var(--txt-0); }
+.nav-item.active { background: var(--blue-lt); color: var(--blue); font-weight: 500; }
+.nav-item.active::before {
+  content: '';
+  position: absolute; left: 0; top: 4px; bottom: 4px;
+  width: 3px; background: var(--blue); border-radius: 0 2px 2px 0;
+}
+.nav-icon { font-size: 15px; width: 18px; text-align: center; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--red);
+  color: #fff;
+  font-size: 10px; font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 10px;
+  min-width: 18px; text-align: center;
+}
+
+.sb-cmd {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+.cmd-btn {
+  width: 100%;
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-1);
+  cursor: pointer;
+  color: var(--txt-1);
+  font-size: 12px;
+}
+.cmd-btn:hover { background: var(--bg-2); }
+.cmd-kbd {
+  margin-left: auto;
+  background: var(--bg-3);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 10px;
+  font-family: monospace;
+}
+
+/* ── MAIN ────────────────────────────────────────────── */
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* ── HEADER ──────────────────────────────────────────── */
+#header {
+  height: var(--header-h);
+  background: var(--bg-0);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+#breadcrumb { color: var(--txt-1); font-size: 13px; flex: 1; }
+#breadcrumb strong { color: var(--txt-0); }
+
+.role-switcher { display: flex; gap: 4px; }
+.role-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-0);
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--txt-1);
+  transition: all 0.1s;
+}
+.role-btn:hover { background: var(--bg-1); }
+.role-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 500; }
+
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.icon-btn {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-0);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  position: relative;
+  color: var(--txt-1);
+}
+.icon-btn:hover { background: var(--bg-1); }
+.notif-dot {
+  position: absolute; top: 5px; right: 5px;
+  width: 6px; height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+}
+
+/* ── CONTENT AREA ────────────────────────────────────── */
+#content {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-2);
+}
+
+/* ── SCREENS ─────────────────────────────────────────── */
+.screen { display: none; padding: 20px; min-height: 100%; }
+.screen.active { display: block; }
+
+/* ── UTILITIES ───────────────────────────────────────── */
+.page-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.page-sub { color: var(--txt-1); font-size: 13px; margin-bottom: 20px; }
+
+.card {
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.card-title { font-weight: 600; font-size: 13px; margin-bottom: 10px; }
+.card-sm { padding: 12px; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.two-col { display: grid; grid-template-columns: 1fr 300px; gap: 0; }
+.two-col-r { display: grid; grid-template-columns: 320px 1fr; gap: 0; }
+
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 11px; font-weight: 500;
+}
+.tag-blue { background: var(--blue-lt); color: var(--blue); }
+.tag-green { background: var(--green-lt); color: var(--green); }
+.tag-amber { background: var(--amber-lt); color: var(--amber); }
+.tag-red { background: var(--red-lt); color: var(--red); }
+.tag-purple { background: var(--purple-lt); color: var(--purple); }
+.tag-orange { background: var(--orange-lt); color: var(--orange); }
+.tag-gray { background: var(--bg-2); color: var(--txt-1); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.1s;
+}
+.btn-primary { background: var(--blue); color: #fff; }
+.btn-primary:hover { background: #1e40af; }
+.btn-secondary { background: var(--bg-0); border-color: var(--border); color: var(--txt-0); }
+.btn-secondary:hover { background: var(--bg-1); }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-s { padding: 4px 10px; font-size: 12px; }
+.btn-xs { padding: 2px 8px; font-size: 11px; }
+
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+.meta { color: var(--txt-2); font-size: 11px; }
+.meta-row { display: flex; gap: 16px; color: var(--txt-2); font-size: 11px; margin-top: 6px; }
+
+.avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+  flex-shrink: 0;
+}
+.av-e { background: #dbeafe; color: #1d4ed8; }
+.av-m { background: #dcfce7; color: #16a34a; }
+.av-t { background: #fef3c7; color: #b45309; }
+.av-n { background: #ede9fe; color: #7c3aed; }
+.av-l { background: #fee2e2; color: #dc2626; }
+.av-p { background: #ffedd5; color: #ea580c; }
+
+.row { display: flex; align-items: center; gap: 8px; }
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+
+/* progress bar */
+.progress-wrap { background: var(--bg-2); border-radius: 4px; height: 6px; overflow: hidden; position: relative; margin: 6px 0 2px; }
+.progress-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+.progress-fill.green { background: var(--green); }
+.progress-fill.blue { background: var(--blue); }
+.progress-fill.amber { background: var(--amber); }
+
+/* stat cards */
+.stat-card {
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.stat-number { font-size: 24px; font-weight: 700; line-height: 1.2; }
+.stat-label { color: var(--txt-1); font-size: 12px; margin-top: 2px; }
+.stat-trend { font-size: 11px; margin-top: 4px; }
+.trend-up { color: var(--green); }
+.trend-dn { color: var(--red); }
+
+/* filter bar */
+.filter-bar {
+  display: flex; gap: 8px; align-items: center;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.filter-chip {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  background: var(--bg-0);
+  color: var(--txt-1);
+}
+.filter-chip.active { background: var(--blue-lt); border-color: var(--blue); color: var(--blue); font-weight: 500; }
+.filter-chip:hover { background: var(--bg-1); }
+.search-input {
+  flex: 1; min-width: 180px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px;
+  background: var(--bg-0);
+  color: var(--txt-0);
+  outline: none;
+}
+.search-input:focus { border-color: var(--blue-mid); }
+
+/* cluster */
+.cluster {
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.cluster-head {
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+}
+.cluster-head:hover { background: var(--bg-1); }
+.cluster.open .cluster-head { border-bottom-color: var(--border); }
+.cluster-icon { font-size: 14px; }
+.cluster-title { font-weight: 600; font-size: 13px; flex: 1; }
+.cluster-count { font-size: 11px; color: var(--txt-2); }
+.cluster-body { display: none; padding: 4px 0; }
+.cluster.open .cluster-body { display: block; }
+.cluster-item {
+  padding: 10px 16px;
+  display: flex; gap: 10px; align-items: flex-start;
+  border-bottom: 1px solid var(--bg-2);
+  cursor: pointer;
+}
+.cluster-item:last-child { border-bottom: none; }
+.cluster-item:hover { background: var(--bg-1); }
+.cluster.danger { border-left: 3px solid var(--red); }
+
+/* comment detail */
+.thread-msg {
+  padding: 10px 14px;
+  background: var(--bg-1);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+}
+.thread-msg.own { background: var(--blue-lt); }
+
+.audit-toggle {
+  font-size: 12px; color: var(--blue); cursor: pointer;
+  background: none; border: none; padding: 0;
+}
+.audit-body { display: none; margin-top: 8px; }
+.audit-body.open { display: block; }
+.audit-entry {
+  display: flex; gap: 8px; align-items: flex-start;
+  font-size: 12px; color: var(--txt-1); padding: 4px 0;
+  border-left: 2px solid var(--border); margin-left: 8px; padding-left: 10px;
+}
+
+/* iter timeline */
+.iter-list { display: flex; flex-direction: column; gap: 0; }
+.iter-row { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; }
+.icirc {
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; flex-shrink: 0; margin-top: 2px;
+}
+.icirc.done { background: var(--green-lt); color: var(--green); border: 2px solid var(--green); }
+.icirc.rej { background: var(--red-lt); color: var(--red); border: 2px solid var(--red); }
+.icirc.cur { background: var(--blue-lt); color: var(--blue); border: 2px solid var(--blue); }
+.icirc.pend { background: var(--bg-2); color: var(--txt-2); border: 2px solid var(--border); }
+.iter-meta { font-size: 12px; color: var(--txt-1); }
+.iter-meta strong { color: var(--txt-0); font-size: 13px; }
+
+/* frame ref */
+.frame-ref {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 4px; padding: 2px 7px;
+  font-size: 11px; color: var(--blue);
+  cursor: pointer; text-decoration: none;
+}
+.frame-ref:hover { background: var(--blue-lt); }
+
+/* modal */
+.modal-wrap { display: none; background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-top: 12px; }
+.modal-wrap.open { display: block; }
+
+/* ── ⌘K OVERLAY ──────────────────────────────────────── */
+#cmd-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1000;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 120px;
+}
+#cmd-overlay.open { display: flex; }
+#cmd-box {
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 540px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+#cmd-input {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 15px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  outline: none;
+  color: var(--txt-0);
+}
+.cmd-results { padding: 8px; }
+.cmd-result-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 13px;
+}
+.cmd-result-item:hover, .cmd-result-item.focused { background: var(--blue-lt); color: var(--blue); }
+.cmd-footer {
+  padding: 8px 18px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--txt-2);
+  display: flex; gap: 12px;
+}
+
+/* ── NOTIFICATION PANEL ──────────────────────────────── */
+#notif-panel {
+  display: none;
+  position: fixed;
+  top: var(--header-h);
+  right: 0;
+  width: 320px;
+  background: var(--bg-0);
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-radius: 0 0 var(--radius) var(--radius);
+  box-shadow: -4px 4px 16px rgba(0,0,0,0.08);
+  z-index: 500;
+  padding: 12px;
+}
+#notif-panel.open { display: block; }
+.notif-item {
+  padding: 10px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border-bottom: 1px solid var(--bg-2);
+  font-size: 12px;
+}
+.notif-item:hover { background: var(--bg-1); }
+.notif-item:last-child { border-bottom: none; }
+.notif-item strong { font-size: 13px; }
+.notif-unread { border-left: 3px solid var(--blue); padding-left: 8px; }
+
+/* ── ROLE-CONDITIONAL SHOW/HIDE ──────────────────────── */
+[data-role] { display: none; }
+
+/* Specific screen layouts */
+.split-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  min-height: 500px;
+}
+.panel-left { border-right: 1px solid var(--border); overflow-y: auto; }
+.panel-right { padding: 20px; overflow-y: auto; }
+.list-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--bg-2);
+  cursor: pointer;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.list-item:hover { background: var(--bg-1); }
+.list-item.selected { background: var(--blue-lt); }
+.list-item-title { font-weight: 500; font-size: 13px; margin-bottom: 3px; }
+.list-item-meta { font-size: 11px; color: var(--txt-2); }
+
+/* Metric cards */
+.metric-card {
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.metric-num { font-size: 28px; font-weight: 700; }
+.metric-label { color: var(--txt-1); font-size: 12px; margin-top: 2px; }
+.metric-target { font-size: 11px; color: var(--txt-2); margin-top: 4px; }
+.metric-type { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Tabs */
+.tab-bar { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 16px; gap: 0; background: var(--bg-0); border-radius: var(--radius) var(--radius) 0 0; }
+.tab-btn {
+  padding: 10px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  color: var(--txt-1);
+  background: none;
+  border-top: none; border-left: none; border-right: none;
+  margin-bottom: -1px;
+}
+.tab-btn:hover { color: var(--txt-0); background: var(--bg-1); }
+.tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 500; }
+
+/* Phase stepper */
+.phase-bar { display: flex; gap: 0; margin-bottom: 20px; }
+.phase-step {
+  flex: 1;
+  padding: 10px 16px;
+  font-size: 12px; font-weight: 500;
+  text-align: center;
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  color: var(--txt-2);
+}
+.phase-step:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.phase-step:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+.phase-step + .phase-step { border-left: none; }
+.phase-step.done { background: var(--green-lt); color: var(--green); }
+.phase-step.active { background: var(--blue); color: #fff; }
+
+.screenshot-ph {
+  width: 100%; height: 260px;
+  background: var(--bg-2);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: var(--txt-2); font-size: 12px; gap: 8px;
+  margin-bottom: 12px;
+}
+.screenshot-ph span { font-size: 28px; }
+
+/* checklist */
+.checklist-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bg-2);
+  font-size: 13px;
+}
+.checklist-item:last-child { border-bottom: none; }
+.check-icon { font-size: 14px; flex-shrink: 0; }
+
+/* knowledge item */
+.know-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--bg-2);
+  cursor: pointer;
+}
+.know-item:hover { background: var(--bg-1); }
+.know-item-title { font-weight: 500; font-size: 13px; margin-bottom: 4px; }
+.know-state {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.state-activa { color: var(--green); }
+.state-reemplazada { color: var(--txt-2); }
+.state-conflicto { color: var(--red); }
+
+/* alert */
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  margin-bottom: 10px;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.alert-blue { background: var(--blue-lt); color: var(--blue); border-left: 3px solid var(--blue); }
+.alert-amber { background: var(--amber-lt); color: var(--amber); border-left: 3px solid var(--amber); }
+.alert-red { background: var(--red-lt); color: var(--red); border-left: 3px solid var(--red); }
+.alert-green { background: var(--green-lt); color: var(--green); border-left: 3px solid var(--green); }
+
+/* report */
+.report-card {
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+.report-card:hover { border-color: var(--blue-mid); }
+.report-icon { font-size: 28px; margin-bottom: 8px; }
+
+/* ── RESPONSIVE TWEAKS ───────────────────────────────── */
+@media (max-width: 900px) {
+  #sidebar { display: none; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--txt-2);
+}
+.empty-state .empty-icon { font-size: 36px; margin-bottom: 12px; }
+.empty-state p { font-size: 13px; }
+
+/* Knowledge block icon (plain, no background) */
+.know-block-icon-plain {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+/* Knowledge blocks */
+.know-block {
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.know-block-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+}
+.know-block-head:hover { background: var(--bg-1); }
+/* .know-block-icon removed — using .know-block-icon-plain */
+.know-block-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.know-block-desc { font-size: 12px; color: var(--txt-2); }
+.know-block-count { font-size: 12px; color: var(--txt-2); white-space: nowrap; }
+.know-block-body {
+  display: none;
+  border-top: 1px solid var(--border);
+}
+.know-block-body.open { display: block; }
+.know-block-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--bg-2);
+  border-left: 3px solid transparent;
+}
+.know-block-item:last-child { border-bottom: none; }
+.know-block-item:hover { background: var(--bg-1); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+@keyframes highlight-block {
+  0%   { box-shadow: 0 0 0 2px var(--blue-mid); }
+  100% { box-shadow: none; }
+}
+
+/* Knowledge block index */
+.kb-index-item {
+  display: flex; flex-direction: row; align-items: center; gap: 7px;
+  padding: 8px 10px;
+  background: var(--bg-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s, background 0.15s;
+}
+.kb-index-item:hover { background: var(--bg-1); border-color: var(--blue-mid); }
+.kb-index-item.active { border-color: var(--blue); background: var(--blue-lt); }
+.kb-index-item.active .kb-index-name { color: var(--blue); font-weight: 600; }
+.kb-index-icon-plain { font-size: 16px; line-height: 1; flex-shrink: 0; }
+.kb-index-name {
+  font-size: 12px; font-weight: 500;
+  color: var(--txt-0);
+  line-height: 1.3;
+  flex: 1;
+}
+.kb-index-badge {
+  font-size: 10px; font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 8px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+.know-block.highlighted {
+  animation: highlight-block 1.2s ease-out forwards;
+}
+
+/* Workflow items */
+.workflow-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bg-2);
+}
+.workflow-item:last-child { border-bottom: none; }
+.wf-icon { width: 32px; height: 32px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!--  SIDEBAR                                            -->
+<!-- ════════════════════════════════════════════════════ -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <div style="display:flex;align-items:center">
+      <div class="logo-mark">D</div>
+      <div>
+        <span>Design Hub</span>
+        <small>Intelligence Platform</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="sb-nav">
+    <div class="nav-item active" onclick="navigate('mi-trabajo')">
+      <span class="nav-icon">🏠</span> Mi trabajo
+    </div>
+    <div class="nav-item" onclick="navigate('comentarios')">
+      <span class="nav-icon">💬</span> Comentarios
+      <span class="nav-badge">7</span>
+    </div>
+    <div class="nav-item" onclick="navigate('proyectos')">
+      <span class="nav-icon">📁</span> Proyectos
+    </div>
+    <div class="nav-item" onclick="navigate('conocimiento')">
+      <span class="nav-icon">🧠</span> Conocimiento
+    </div>
+    <div class="nav-item" onclick="navigate('revisiones')">
+      <span class="nav-icon">✅</span> Revisiones
+      <span class="nav-badge" style="background:var(--amber)">3</span>
+    </div>
+    <div class="nav-item" onclick="navigate('analisis')">
+      <span class="nav-icon">📊</span> Análisis
+    </div>
+    <div class="nav-item" onclick="navigate('informes')">
+      <span class="nav-icon">📄</span> Informes
+    </div>
+  </div>
+
+  <div class="sb-cmd">
+    <button class="cmd-btn" onclick="togglePreguntar()">
+      <span>🔍</span>
+      <span>Preguntar al Hub…</span>
+      <span class="cmd-kbd">⌘K</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!--  MAIN                                               -->
+<!-- ════════════════════════════════════════════════════ -->
+<div id="main">
+
+  <!-- HEADER -->
+  <header id="header">
+    <div id="breadcrumb"><strong id="breadcrumb-text">Mi trabajo</strong></div>
+
+    <div class="role-switcher">
+      <button class="role-btn active" onclick="setRole('elena')">Elena</button>
+      <button class="role-btn" onclick="setRole('marc')">Marc</button>
+      <button class="role-btn" onclick="setRole('tomas')">Tomás</button>
+      <button class="role-btn" onclick="setRole('nora')">Nora</button>
+      <button class="role-btn" onclick="setRole('leo')">Leo</button>
+      <button class="role-btn" onclick="setRole('priya')">Priya</button>
+    </div>
+
+    <div class="header-actions">
+      <button class="icon-btn" onclick="toggleNotif()" title="Notificaciones">
+        🔔
+        <span class="notif-dot"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- W1 — MI TRABAJO                                  -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="screen-mi-trabajo" class="screen active">
+      <div class="page-title">Mi trabajo</div>
+      <div class="page-sub">Vista personalizada según tu rol y pendientes activos</div>
+
+      <!-- Alerts -->
+      <div id="mt-elena" data-role="elena">
+        <div class="alert alert-red">
+          <span>🚨</span>
+          <div><strong>Bloqueo detectado:</strong> Marc espera aprobación de paleta de colores para continuar el componente de navegación. <button class="btn btn-secondary btn-xs" style="margin-left:8px" onclick="navigate('comentarios')">Ver comentario</button></div>
+        </div>
+        <div class="alert alert-amber">
+          <span>⏰</span>
+          <div><strong>3 handoffs pendientes de revisión</strong> — Checkout flow lleva 5 días en espera. <button class="btn btn-secondary btn-xs" style="margin-left:8px" onclick="navigate('revisiones')">Ir a revisiones</button></div>
+        </div>
+
+        <div class="grid-3" style="margin-bottom:16px">
+          <div class="stat-card">
+            <div class="stat-number">12</div>
+            <div class="stat-label">Comentarios sin reclamar</div>
+            <div class="stat-trend trend-dn">↓ 3 desde ayer</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">4</div>
+            <div class="stat-label">Decisiones pendientes</div>
+            <div class="stat-trend trend-up">↑ 1 nueva hoy</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">87%</div>
+            <div class="stat-label">Resolución esta semana</div>
+            <div class="stat-trend trend-up">↑ vs 72% semana anterior</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">📥 Pendiente de mí</div>
+            <div class="list-item" style="padding:10px 0" onclick="navigate('revisiones')">
+              <span>✅</span>
+              <div>
+                <div class="list-item-title">Revisar handoff — Checkout v3</div>
+                <div class="list-item-meta">Marc · Enviado hace 5 días</div>
+              </div>
+            </div>
+            <div class="list-item" style="padding:10px 0" onclick="navigate('comentarios')">
+              <span>💬</span>
+              <div>
+                <div class="list-item-title">Resolver bloqueo — Paleta colores</div>
+                <div class="list-item-meta">Marc · Bloqueado desde ayer</div>
+              </div>
+            </div>
+            <div class="list-item" style="padding:10px 0">
+              <span>🧠</span>
+              <div>
+                <div class="list-item-title">Confirmar estado conocimiento — Tokens tipografía</div>
+                <div class="list-item-meta">Nora propone cambio · Hace 2h</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">⚡ Actividad reciente del equipo</div>
+            <div class="list-item" style="padding:10px 0">
+              <div class="avatar av-m">M</div>
+              <div>
+                <div class="list-item-title">Marc envió Checkout v3 a revisión</div>
+                <div class="list-item-meta">Hace 5 días</div>
+              </div>
+            </div>
+            <div class="list-item" style="padding:10px 0">
+              <div class="avatar av-t">T</div>
+              <div>
+                <div class="list-item-title">Tomás resolvió 3 comentarios en Mobile Nav</div>
+                <div class="list-item-meta">Hace 2h</div>
+              </div>
+            </div>
+            <div class="list-item" style="padding:10px 0">
+              <div class="avatar av-n">N</div>
+              <div>
+                <div class="list-item-title">Nora creó informe — Retrospectiva sprint 12</div>
+                <div class="list-item-meta">Ayer a las 16:30</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="mt-marc" data-role="marc">
+        <div class="alert alert-amber">
+          <span>⏳</span>
+          <div><strong>Checkout v3 en revisión</strong> — Elena lleva 5 días sin responder. Puedes enviar un recordatorio.</div>
+        </div>
+        <div class="grid-3" style="margin-bottom:16px">
+          <div class="stat-card">
+            <div class="stat-number">2</div>
+            <div class="stat-label">Handoffs en revisión</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">5</div>
+            <div class="stat-label">Comentarios respondidos esta semana</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">1</div>
+            <div class="stat-label">Bloqueo activo</div>
+            <div class="stat-trend trend-dn">Paleta de colores</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📤 Mis handoffs activos</div>
+          <div class="list-item" style="padding:10px 0" onclick="navigate('handoff')">
+            <span>🔄</span>
+            <div>
+              <div class="list-item-title">Checkout v3 — En revisión <span class="tag tag-amber">5 días</span></div>
+              <div class="list-item-meta">Enviado a Elena · Sprint 12</div>
+            </div>
+          </div>
+          <div class="list-item" style="padding:10px 0">
+            <span>✅</span>
+            <div>
+              <div class="list-item-title">Mobile Nav — Aprobado</div>
+              <div class="list-item-meta">Elena aprobó hace 3 días</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="mt-tomas" data-role="tomas">
+        <div class="alert alert-blue">
+          <span>👋</span>
+          <div><strong>Semana 3 de onboarding</strong> — Buen progreso. Llevas 12 comentarios resueltos este mes.</div>
+        </div>
+        <div class="grid-2" style="margin-bottom:16px">
+          <div class="stat-card">
+            <div class="stat-number">12</div>
+            <div class="stat-label">Comentarios resueltos este mes</div>
+            <div class="stat-trend">Objetivo: 10 ✅</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">78%</div>
+            <div class="stat-label">Progreso onboarding</div>
+            <div class="progress-wrap"><div class="progress-fill blue" style="width:78%"></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📚 Próximos pasos onboarding</div>
+          <div class="checklist-item"><span class="check-icon">✅</span> Revisión sistema de diseño con Elena</div>
+          <div class="checklist-item"><span class="check-icon">✅</span> Primera resolución de comentarios autónoma</div>
+          <div class="checklist-item"><span class="check-icon">⬜</span> Primer handoff enviado a revisión</div>
+          <div class="checklist-item"><span class="check-icon">⬜</span> Participar en Silent Crit</div>
+        </div>
+      </div>
+
+      <div id="mt-nora" data-role="nora">
+        <div class="grid-3" style="margin-bottom:16px">
+          <div class="stat-card">
+            <div class="stat-number">3</div>
+            <div class="stat-label">Informes pendientes de publicar</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">94%</div>
+            <div class="stat-label">Tiempo de respuesta a stakeholders</div>
+            <div class="stat-trend trend-up">↑ vs objetivo 90%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">2</div>
+            <div class="stat-label">Workflows activos</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 Tareas de PM activas</div>
+          <div class="list-item" style="padding:10px 0">
+            <span>📊</span>
+            <div><div class="list-item-title">Preparar informe sprint 12 para dirección</div>
+              <div class="list-item-meta">Vence mañana</div></div>
+          </div>
+          <div class="list-item" style="padding:10px 0">
+            <span>✅</span>
+            <div><div class="list-item-title">Validar criterios de aceptación — Checkout</div>
+              <div class="list-item-meta">Esperando aportación de Leo</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="mt-leo" data-role="leo">
+        <div class="grid-3" style="margin-bottom:16px">
+          <div class="stat-card">
+            <div class="stat-number">8h</div>
+            <div class="stat-label">Tiempo medio respuesta a diseño</div>
+            <div class="stat-trend">Objetivo: &lt;12h ✅</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">2</div>
+            <div class="stat-label">Handoffs con cambios solicitados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">6</div>
+            <div class="stat-label">Preguntas técnicas respondidas esta semana</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚙️ Validaciones técnicas pendientes</div>
+          <div class="list-item" style="padding:10px 0" onclick="navigate('revisiones')">
+            <span>🔍</span>
+            <div><div class="list-item-title">Revisar viabilidad — Animaciones checkout</div>
+              <div class="list-item-meta">Marc · Urgente</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="mt-priya" data-role="priya">
+        <div class="grid-3" style="margin-bottom:16px">
+          <div class="stat-card">
+            <div class="stat-number">4h</div>
+            <div class="stat-label">Tiempo medio de respuesta de diseño</div>
+            <div class="stat-trend">¿Me responden a tiempo?</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">92%</div>
+            <div class="stat-label">Comentarios técnicos resueltos</div>
+            <div class="stat-trend trend-up">↑ vs 85% semana anterior</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">1</div>
+            <div class="stat-label">Dependencias externas bloqueantes</div>
+          </div>
+        </div>
+        <div class="alert alert-amber">
+          <span>⏳</span>
+          <div><strong>Dependencia pendiente</strong> — Esperando especificación de Leo para continuar con las animaciones del carrito.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- W11 — COMENTARIOS (INBOX)                        -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="screen-comentarios" class="screen">
+      <div class="page-title">Inbox de comentarios</div>
+      <div class="page-sub">Comentarios sin reclamar agrupados por tema emergente · LLM</div>
+
+      <div class="filter-bar">
+        <input class="search-input" placeholder="Buscar en comentarios…" style="max-width:220px">
+        <span class="filter-chip active">Sin reclamar</span>
+        <span class="filter-chip">Bloqueantes</span>
+        <span class="filter-chip">Sin resolver</span>
+        <span class="filter-chip">Dependencias</span>
+        <span class="filter-chip">Por proyecto ▾</span>
+        <span class="filter-chip">Por fecha ▾</span>
+        <button class="btn btn-primary btn-s" style="margin-left:auto">+ Reclamar selección</button>
+      </div>
+
+      <div class="grid-3" style="margin-bottom:16px">
+        <div class="stat-card">
+          <div class="stat-number">12</div>
+          <div class="stat-label">Sin reclamar</div>
+          <div class="stat-trend trend-dn">↓ 3 vs ayer</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Bloqueantes activos</div>
+          <div class="stat-trend trend-up" style="color:var(--red)">↑ 1 nuevo</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">5</div>
+          <div class="stat-label">Respondido sin resolver</div>
+        </div>
+      </div>
+
+      <!-- Cluster 1: Danger (dependencia) -->
+      <div class="cluster danger open" id="cluster-dep">
+        <div class="cluster-head" onclick="toggleCluster('cluster-dep')">
+          <span class="cluster-icon">🚨</span>
+          <span class="cluster-title">Dependencias externas — en espera de acción</span>
+          <span class="tag tag-red">Bloqueante</span>
+          <span class="cluster-count">2 comentarios</span>
+          <span style="margin-left:8px;color:var(--txt-2);font-size:12px">▲</span>
+        </div>
+        <div class="cluster-body">
+          <div class="cluster-item" onclick="navigate('comentario-detalle')">
+            <div class="avatar av-m">M</div>
+            <div style="flex:1">
+              <div style="font-weight:500;font-size:13px;margin-bottom:3px">
+                "He terminado la maquetación del carrito — necesito las especificaciones de animación de Priya para continuar"
+              </div>
+              <div class="meta-row">
+                <span>Marc · Checkout v3</span>
+                <span>hace 2h</span>
+                <span class="tag tag-red" style="font-size:10px">Dependencia externa</span>
+                <span class="tag tag-purple" style="font-size:10px">LLM: Actor → Priya</span>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-xs">Asignar</button>
+          </div>
+          <div class="cluster-item">
+            <div class="avatar av-t">T</div>
+            <div style="flex:1">
+              <div style="font-weight:500;font-size:13px;margin-bottom:3px">
+                "Los tokens del sistema de diseño no coinciden con los de la librería — ¿qué versión es la buena?"
+              </div>
+              <div class="meta-row">
+                <span>Tomás · Mobile Nav</span>
+                <span>hace 4h</span>
+                <span class="tag tag-red" style="font-size:10px">Dependencia externa</span>
+                <span class="tag tag-purple" style="font-size:10px">LLM: Actor → Elena</span>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-xs">Asignar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cluster 2: Typografía -->
+      <div class="cluster" id="cluster-tipo">
+        <div class="cluster-head" onclick="toggleCluster('cluster-tipo')">
+          <span class="cluster-icon">🔤</span>
+          <span class="cluster-title">Tipografía y jerarquía visual</span>
+          <span class="tag tag-purple" style="font-size:10px">🤖 LLM</span>
+          <span class="cluster-count">3 comentarios · 2 proyectos</span>
+          <span style="margin-left:8px;color:var(--txt-2);font-size:12px">▼</span>
+        </div>
+        <div class="cluster-body">
+          <div class="cluster-item" onclick="navigate('comentario-detalle')">
+            <div class="avatar av-l">L</div>
+            <div style="flex:1">
+              <div style="font-weight:500;font-size:13px;margin-bottom:3px">
+                "El tamaño de la fuente en mobile es demasiado pequeño para el copy secundario"
+              </div>
+              <div class="meta-row">
+                <span>Leo · Mobile Nav</span>
+                <span>ayer</span>
+                <span class="tag tag-blue" style="font-size:10px">Propuesta</span>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-xs">Reclamar</button>
+          </div>
+          <div class="cluster-item">
+            <div class="avatar av-p">P</div>
+            <div style="flex:1">
+              <div style="font-weight:500;font-size:13px;margin-bottom:3px">
+                "Los headings H2 y H3 tienen pesos visuales muy similares — dificulta la jerarquía"
+              </div>
+              <div class="meta-row">
+                <span>Priya · Dashboard</span>
+                <span>hace 2 días</span>
+                <span class="tag tag-amber" style="font-size:10px">Respondido sin resolver</span>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-xs">Reclamar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cluster 3: Spacing -->
+      <div class="cluster" id="cluster-spacing">
+        <div class="cluster-head" onclick="toggleCluster('cluster-spacing')">
+          <span class="cluster-icon">📐</span>
+          <span class="cluster-title">Espaciado y grid</span>
+          <span class="tag tag-purple" style="font-size:10px">🤖 LLM</span>
+          <span class="cluster-count">2 comentarios</span>
+          <span style="margin-left:8px;color:var(--txt-2);font-size:12px">▼</span>
+        </div>
+        <div class="cluster-body">
+          <div class="cluster-item">
+            <div class="avatar av-n">N</div>
+            <div style="flex:1">
+              <div style="font-weight:500;font-size:13px;margin-bottom:3px">
+                "El padding interior de las cards no es consistente — unas tienen 16px otras 12px"
+              </div>
+              <div class="meta-row"><span>Nora · Checkout v3</span><span>hace 3 días</span>
+                <span class="tag tag-blue" style="font-size:10px">Pregunta</span>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-xs">Reclamar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sin agrupar -->
+      <div style="margin-top:16px">
+        <div style="font-size:12px;color:var(--txt-2);margin-bottom:8px;font-weight:500">SIN CLASIFICAR — LLM no pudo agrupar</div>
+        <div class="card card-sm">
+          <div class="cluster-item" style="padding:10px 0;border:none">
+            <div class="avatar av-e">E</div>
+            <div style="flex:1">
+              <div style="font-weight:500;font-size:13px;margin-bottom:3px">
+                "¿Confirmamos que la versión de accesibilidad va en el sprint 13 o se mueve?"
+              </div>
+              <div class="meta-row"><span>Elena · Planning</span><span>hace 1h</span>
+                <span class="tag tag-gray" style="font-size:10px">Confirmación</span>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-xs">Reclamar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- W2 REVISED — DETALLE DE COMENTARIO               -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="screen-comentario-detalle" class="screen">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <button class="btn btn-secondary btn-s" onclick="navigate('comentarios')">← Volver al inbox</button>
+        <div class="page-title" style="margin:0">Detalle de comentario</div>
+      </div>
+
+      <div class="two-col" style="background:var(--bg-0);border:1px solid var(--border);border-radius:var(--radius)">
+        <!-- Left: thread -->
+        <div style="padding:20px;border-right:1px solid var(--border)">
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px">
+            <div class="avatar av-m" style="width:32px;height:32px;font-size:13px">M</div>
+            <div style="flex:1">
+              <div style="font-weight:600;font-size:14px">Marc Puig</div>
+              <div class="meta">Checkout v3 · Frame: Button group · Hace 2h</div>
+              <div style="margin-top:8px;font-size:13px;line-height:1.5">
+                "He terminado la maquetación del carrito — necesito las especificaciones de animación de Priya para continuar con la micro-interacción del botón de añadir al carrito."
+              </div>
+              <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+                <span class="tag tag-red">🚨 Dependencia externa</span>
+                <span class="tag tag-purple">🤖 LLM: Actor → Priya</span>
+                <span class="tag tag-gray">Nota técnica</span>
+              </div>
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <!-- Thread replies -->
+          <div style="font-weight:600;font-size:12px;color:var(--txt-2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">HILO DE RESPUESTAS</div>
+
+          <div class="thread-msg">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <div class="avatar av-e">E</div>
+              <strong style="font-size:13px">Elena García</strong>
+              <span class="meta">hace 1h</span>
+              <span class="tag tag-blue" style="font-size:10px">Confirmación</span>
+            </div>
+            <div style="font-size:13px">Priya, ¿puedes compartir las specs de animación esta tarde? Marc está bloqueado.</div>
+          </div>
+
+          <div class="thread-msg" style="background:var(--amber-lt)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <div class="avatar av-p">P</div>
+              <strong style="font-size:13px">Priya Sharma</strong>
+              <span class="meta">hace 30min</span>
+              <span class="tag tag-amber" style="font-size:10px">Respondido sin resolver</span>
+            </div>
+            <div style="font-size:13px">Lo revisaré hoy. Estoy terminando otro sprint pero lo tengo en el radar.</div>
+            <div style="font-size:11px;color:var(--amber);margin-top:4px">⚠ Respondió pero no aportó resolución concreta</div>
+          </div>
+
+          <div style="margin-top:12px">
+            <textarea style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;min-height:80px;resize:vertical;font-family:inherit" placeholder="Añadir respuesta…"></textarea>
+            <div style="display:flex;justify-content:flex-end;margin-top:6px">
+              <button class="btn btn-primary btn-s">Enviar respuesta</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: metadata + classification -->
+        <div style="padding:20px;">
+          <div style="font-weight:600;font-size:12px;color:var(--txt-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">CLASIFICACIÓN</div>
+
+          <div class="card card-sm" style="margin-bottom:12px">
+            <div style="font-size:12px;color:var(--txt-2);margin-bottom:4px">Tipo de acto comunicativo</div>
+            <div style="font-weight:500">Dependencia externa</div>
+            <div style="font-size:12px;color:var(--txt-2);margin-top:6px;margin-bottom:2px">Salida de conocimiento</div>
+            <div style="font-weight:500">Tarea</div>
+            <div style="font-size:12px;color:var(--txt-2);margin-top:6px;margin-bottom:2px">Estado</div>
+            <div style="font-weight:500">🔴 Bloqueante activo</div>
+            <button class="btn btn-secondary btn-s" style="margin-top:10px;width:100%">✏️ Editar clasificación</button>
+          </div>
+
+          <div style="font-weight:600;font-size:12px;color:var(--txt-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">ASIGNACIÓN</div>
+          <div class="card card-sm" style="margin-bottom:12px">
+            <div class="row" style="margin-bottom:6px">
+              <span style="font-size:12px;color:var(--txt-2);width:110px">Destinatario</span>
+              <div class="row"><div class="avatar av-p">P</div> <span style="font-size:12px">Priya Sharma</span></div>
+            </div>
+            <div class="row" style="margin-bottom:6px">
+              <span style="font-size:12px;color:var(--txt-2);width:110px">Actor requerido</span>
+              <div class="row"><div class="avatar av-p">P</div> <span style="font-size:12px">Priya Sharma</span></div>
+            </div>
+            <div class="row">
+              <span style="font-size:12px;color:var(--txt-2);width:110px">Propietario</span>
+              <div class="row"><div class="avatar av-e">E</div> <span style="font-size:12px">Elena (default)</span></div>
+            </div>
+          </div>
+
+          <div style="font-weight:600;font-size:12px;color:var(--txt-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">CONOCIMIENTO RELACIONADO</div>
+          <div style="font-size:12px;color:var(--txt-1);margin-bottom:8px">
+            <div class="know-item" style="padding:8px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;cursor:pointer" onclick="navigate('conocimiento')">
+              <div class="know-item-title">Animaciones de micro-interacción — v2</div>
+              <div class="row" style="margin-top:3px">
+                <span class="know-state state-activa">● ACTIVA</span>
+                <span class="meta">Sistema de diseño</span>
+              </div>
+            </div>
+            <div class="know-item" style="padding:8px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer">
+              <div class="know-item-title">Especificaciones carrito — sprint 11</div>
+              <div class="row" style="margin-top:3px">
+                <span class="know-state state-reemplazada">● REEMPLAZADA</span>
+                <span class="meta">Checkout</span>
+              </div>
+            </div>
+            <div style="font-size:12px;color:var(--blue);cursor:pointer;margin-top:8px">Ver 4 entradas más →</div>
+          </div>
+
+          <div style="font-size:11px;color:var(--txt-2);background:var(--bg-1);border-radius:var(--radius);padding:8px;margin-top:4px">
+            🔒 Solo Elena y Leo pueden cambiar el estado de conocimiento. Otros pueden proponer cambios.
+          </div>
+
+          <hr class="divider">
+          <div style="font-weight:600;font-size:12px;color:var(--txt-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">HISTORIAL DE ESTADO</div>
+          <button class="audit-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▶ Mostrar historial de cambios (2)</button>
+          <div class="audit-body">
+            <div class="audit-entry">
+              <span>🔄</span>
+              <div>
+                <strong>Elena García</strong> cambió estado a <em>Bloqueante activo</em><br>
+                <span class="meta">Hoy a las 10:32 — "Confirmado con Marc"</span>
+              </div>
+            </div>
+            <div class="audit-entry">
+              <span>📝</span>
+              <div>
+                <strong>LLM</strong> clasificó como <em>Dependencia externa</em><br>
+                <span class="meta">Hoy a las 09:15 — Autodetección por patrón de texto</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- W3 — PROYECTOS                                   -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="screen-proyectos" class="screen">
+      <div class="page-title">Proyectos</div>
+      <div class="page-sub">Vista general de proyectos activos y su estado</div>
+
+      <div class="filter-bar">
+        <input class="search-input" placeholder="Buscar proyectos…" style="max-width:220px">
+        <span class="filter-chip active">Todos</span>
+        <span class="filter-chip">En progreso</span>
+        <span class="filter-chip">En revisión</span>
+        <span class="filter-chip">Aprobados</span>
+        <button class="btn btn-primary btn-s" style="margin-left:auto">+ Nuevo proyecto</button>
+      </div>
+
+      <div class="split-panel">
+        <div class="panel-left">
+          <div class="list-item selected" onclick="showProject('checkout')">
+            <div style="flex:1">
+              <div class="list-item-title">Checkout v3 <span class="tag tag-amber">En revisión</span></div>
+              <div class="list-item-meta">Marc Puig · Sprint 12 · 5 comentarios activos</div>
+            </div>
+          </div>
+          <div class="list-item" onclick="showProject('mobile-nav')">
+            <div style="flex:1">
+              <div class="list-item-title">Mobile Nav <span class="tag tag-green">Aprobado</span></div>
+              <div class="list-item-meta">Marc Puig · Sprint 11 · 0 comentarios</div>
+            </div>
+          </div>
+          <div class="list-item" onclick="showProject('dashboard')">
+            <div style="flex:1">
+              <div class="list-item-title">Dashboard Analytics <span class="tag tag-blue">En progreso</span></div>
+              <div class="list-item-meta">Tomás Silva · Sprint 12 · 8 comentarios activos</div>
+            </div>
+          </div>
+          <div class="list-item" onclick="showProject('design-system')">
+            <div style="flex:1">
+              <div class="list-item-title">Design System v2 <span class="tag tag-blue">En progreso</span></div>
+              <div class="list-item-meta">Elena García · Ongoing · 12 comentarios activos</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-right">
+          <div style="font-weight:700;font-size:16px;margin-bottom:4px">Checkout v3</div>
+          <div class="tag tag-amber" style="margin-bottom:12px">En revisión</div>
+          <div class="meta-row" style="margin-bottom:16px">
+            <span>👤 Marc Puig</span>
+            <span>📅 Sprint 12</span>
+            <span>🗓 Entrega: 28 jun</span>
+          </div>
+          <div class="grid-2" style="margin-bottom:16px">
+            <div class="stat-card" style="padding:10px 12px">
+              <div class="stat-number" style="font-size:20px">5</div>
+              <div class="stat-label">Comentarios activos</div>
+            </div>
+            <div class="stat-card" style="padding:10px 12px">
+              <div class="stat-number" style="font-size:20px">1</div>
+              <div class="stat-label">Bloqueos</div>
+            </div>
+          </div>
+          <div style="font-weight:600;font-size:12px;color:var(--txt-2);text-transform:uppercase;margin-bottom:8px">ACTIVIDAD RECIENTE</div>
+          <div class="list-item" style="padding:8px 0">
+            <div class="avatar av-m">M</div>
+            <div><div class="list-item-title">Handoff enviado a revisión</div>
+              <div class="list-item-meta">hace 5 días</div></div>
+          </div>
+          <div class="list-item" style="padding:8px 0">
+            <div class="avatar av-l">L</div>
+            <div><div class="list-item-title">Leo solicitó cambios en animaciones</div>
+              <div class="list-item-meta">hace 3 días</div></div>
+          </div>
+          <hr class="divider">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary btn-s" onclick="navigate('revisiones')">Ver handoff</button>
+            <button class="btn btn-secondary btn-s" onclick="navigate('comentarios')">Ver comentarios</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- W5 — CONOCIMIENTO                                -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="screen-conocimiento" class="screen">
+      <div class="page-title">Base de conocimiento</div>
+      <div class="page-sub">Índice de bloques temáticos generado por el LLM · RAG activo</div>
+
+      <div class="filter-bar">
+        <input class="search-input" placeholder="¿Por qué usamos border-radius de 6px?…" style="max-width:320px" id="know-search" oninput="filterKnowledge(this.value)">
+        <span class="filter-chip active" onclick="switchKnowView('index',this)">Índice</span>
+        <span class="filter-chip" onclick="switchKnowView('preguntar',this)">Preguntar</span>
+        <span class="filter-chip" onclick="switchKnowView('recientes',this)">Recientes</span>
+        <span class="filter-chip">Estado ▾</span>
+        <span class="filter-chip">Proyecto ▾</span>
+        <button class="btn btn-primary btn-s" style="margin-left:auto">+ Añadir entrada</button>
+      </div>
+
+      <!-- Block index -->
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px" id="kb-index">
+        <div class="kb-index-item active" onclick="selectBlock('todos',this)" style="display:flex;flex-direction:row;align-items:center;gap:7px;padding:8px 12px;min-width:80px">
+          <span style="font-size:16px;flex-shrink:0">◼</span>
+          <span class="kb-index-name">Todos</span>
+        </div>
+        <div class="kb-index-item" onclick="selectBlock('kb-ds',this)" style="display:flex;flex-direction:row;align-items:center;gap:7px;padding:8px 12px;min-width:120px">
+          <span style="font-size:16px;flex-shrink:0">🎨</span>
+          <span class="kb-index-name" style="flex:1">Sistema de Diseño</span>
+          <span style="font-size:10px;background:var(--red-lt);color:var(--red);padding:1px 5px;border-radius:8px;font-weight:600">⚠</span>
+        </div>
+        <div class="kb-index-item" onclick="selectBlock('kb-proc',this)" style="display:flex;flex-direction:row;align-items:center;gap:7px;padding:8px 12px;min-width:120px">
+          <span style="font-size:16px;flex-shrink:0">⚙️</span>
+          <span class="kb-index-name">Proceso de entrega</span>
+        </div>
+        <div class="kb-index-item" onclick="selectBlock('kb-motion',this)" style="display:flex;flex-direction:row;align-items:center;gap:7px;padding:8px 12px;min-width:120px">
+          <span style="font-size:16px;flex-shrink:0">✨</span>
+          <span class="kb-index-name">Interacción y motion</span>
+        </div>
+        <div class="kb-index-item" onclick="selectBlock('kb-a11y',this)" style="display:flex;flex-direction:row;align-items:center;gap:7px;padding:8px 12px;min-width:120px">
+          <span style="font-size:16px;flex-shrink:0">♿</span>
+          <span class="kb-index-name">Accesibilidad</span>
+        </div>
+        <div class="kb-index-item" onclick="selectBlock('kb-prod',this)" style="display:flex;flex-direction:row;align-items:center;gap:7px;padding:8px 12px;min-width:120px">
+          <span style="font-size:16px;flex-shrink:0">🎯</span>
+          <span class="kb-index-name">Producto y estrategia</span>
+        </div>
+        <div class="kb-index-item" onclick="selectBlock('kb-uncat',this)" style="display:flex;flex-direction:row;align-items:center;gap:7px;padding:8px 12px;min-width:120px;opacity:.8">
+          <span style="font-size:16px;flex-shrink:0">❓</span>
+          <span class="kb-index-name" style="flex:1">Sin clasificar</span>
+          <span style="font-size:10px;background:var(--purple-lt);color:var(--purple);padding:1px 5px;border-radius:8px;font-weight:600">1</span>
+        </div>
+      </div>
+
+      <!-- VIEW: INDEX (default) -->
+      <div id="know-view-index">
+
+        <!-- Nueva entrada clasificando -->
+        <div class="card" style="border-color:var(--purple);border-style:dashed;margin-bottom:12px;padding:10px 14px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="tag tag-purple" style="animation:pulse 1.5s infinite">🤖 Clasificando…</span>
+            <div style="font-size:13px;color:var(--txt-1)">
+              <strong style="color:var(--txt-0)">"Decisión de contraste WCAG — botones de acción"</strong>
+              — añadida por Elena hace 5 min · El LLM está determinando el bloque
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 1: Sistema de Diseño -->
+        <div class="know-block" id="kb-ds">
+          <div class="know-block-head" onclick="toggleKnowBlock('kb-ds')">
+            <div class="know-block-icon-plain" style="font-size:20px">🎨</div>
+            <div style="flex:1">
+              <div class="know-block-title">Sistema de Diseño</div>
+              <div class="know-block-desc" style="display:none">Tokens, componentes, decisiones de estilo y guías visuales</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="know-block-count">8 entradas</span>
+              <span class="know-state state-activa" style="font-size:10px">7 activas</span>
+              <span style="color:var(--txt-2);font-size:12px" class="kb-arrow">▼</span>
+            </div>
+          </div>
+          <div class="know-block-body open">
+            <div class="know-block-item" style="border-left-color:var(--green)">
+              <div style="flex:1">
+                <div class="know-item-title">Border-radius · Tokens de forma</div>
+                <div class="meta-row">
+                  <span class="know-state state-activa">● ACTIVA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Decisión</span>
+                  <span class="meta">Sprint 9 · Elena</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+            <div class="know-block-item" style="border-left-color:var(--red)">
+              <div style="flex:1">
+                <div class="know-item-title">Tokens tipografía — escala móvil</div>
+                <div class="meta-row">
+                  <span class="know-state state-conflicto">● EN CONFLICTO</span>
+                  <span class="tag tag-gray" style="font-size:10px">Decisión</span>
+                  <span class="meta">Sprint 12 · Nora</span>
+                </div>
+                <div class="alert alert-red" style="margin:6px 0 0;padding:6px 10px;font-size:11px">
+                  ⚠ Conflicto: Nora propone escala 14/12 · Elena mantiene 16/13. Pendiente resolución.
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+            <div class="know-block-item" style="border-left-color:var(--green)">
+              <div style="flex:1">
+                <div class="know-item-title">Paleta de colores v1.3 · Modo claro</div>
+                <div class="meta-row">
+                  <span class="know-state state-activa">● ACTIVA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Decisión</span>
+                  <span class="meta">Sprint 10 · Elena</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+            <div style="padding:8px 12px">
+              <span style="font-size:12px;color:var(--blue);cursor:pointer">Ver 5 entradas más →</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 2: Proceso de entrega -->
+        <div class="know-block" id="kb-proc">
+          <div class="know-block-head" onclick="toggleKnowBlock('kb-proc')">
+            <div class="know-block-icon-plain" style="font-size:20px">⚙️</div>
+            <div style="flex:1">
+              <div class="know-block-title">Proceso de entrega</div>
+              <div class="know-block-desc" style="display:none">Handoff, revisiones, criterios de aceptación y flujos de trabajo</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="know-block-count">5 entradas</span>
+              <span class="know-state state-activa" style="font-size:10px">5 activas</span>
+              <span style="color:var(--txt-2);font-size:12px" class="kb-arrow">▶</span>
+            </div>
+          </div>
+          <div class="know-block-body">
+            <div class="know-block-item" style="border-left-color:var(--green)">
+              <div style="flex:1">
+                <div class="know-item-title">Checklist de handoff — v2</div>
+                <div class="meta-row">
+                  <span class="know-state state-activa">● ACTIVA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Proceso</span>
+                  <span class="meta">Sprint 11 · Elena</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+            <div class="know-block-item" style="border-left-color:var(--txt-2)">
+              <div style="flex:1">
+                <div class="know-item-title">Criterios Silent Crit — v1</div>
+                <div class="meta-row">
+                  <span class="know-state state-reemplazada">● REEMPLAZADA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Proceso</span>
+                  <span class="meta">Sprint 8 · Elena</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+            <div style="padding:8px 12px">
+              <span style="font-size:12px;color:var(--blue);cursor:pointer">Ver 3 entradas más →</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 3: Interacción y motion -->
+        <div class="know-block" id="kb-motion">
+          <div class="know-block-head" onclick="toggleKnowBlock('kb-motion')">
+            <div class="know-block-icon-plain" style="font-size:20px">✨</div>
+            <div style="flex:1">
+              <div class="know-block-title">Interacción y motion</div>
+              <div class="know-block-desc" style="display:none">Animaciones, micro-interacciones, transiciones y comportamientos</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="know-block-count">4 entradas</span>
+              <span class="know-state state-activa" style="font-size:10px">3 activas</span>
+              <span style="color:var(--txt-2);font-size:12px" class="kb-arrow">▶</span>
+            </div>
+          </div>
+          <div class="know-block-body">
+            <div class="know-block-item" style="border-left-color:var(--green)">
+              <div style="flex:1">
+                <div class="know-item-title">Animaciones micro-interacción carrito — v2</div>
+                <div class="meta-row">
+                  <span class="know-state state-activa">● ACTIVA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Nota técnica</span>
+                  <span class="meta">Sprint 11 · Priya</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+            <div class="know-block-item" style="border-left-color:var(--txt-2)">
+              <div style="flex:1">
+                <div class="know-item-title">Especificaciones carrito — sprint 11</div>
+                <div class="meta-row">
+                  <span class="know-state state-reemplazada">● REEMPLAZADA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Nota técnica</span>
+                  <span class="meta">Sprint 10 · Leo</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 4: Accesibilidad -->
+        <div class="know-block" id="kb-a11y">
+          <div class="know-block-head" onclick="toggleKnowBlock('kb-a11y')">
+            <div class="know-block-icon-plain" style="font-size:20px">♿</div>
+            <div style="flex:1">
+              <div class="know-block-title">Accesibilidad</div>
+              <div class="know-block-desc" style="display:none">WCAG, ratios de contraste, navegación por teclado y lectores de pantalla</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="know-block-count">4 entradas</span>
+              <span class="know-state state-activa" style="font-size:10px">4 activas</span>
+              <span style="color:var(--txt-2);font-size:12px" class="kb-arrow">▶</span>
+            </div>
+          </div>
+          <div class="know-block-body">
+            <div class="know-block-item" style="border-left-color:var(--green)">
+              <div style="flex:1">
+                <div class="know-item-title">Ratio de contraste mínimo — botones de acción</div>
+                <div class="meta-row">
+                  <span class="know-state state-activa">● ACTIVA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Decisión</span>
+                  <span class="meta">Sprint 9 · Elena</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 5: Producto y estrategia -->
+        <div class="know-block" id="kb-prod">
+          <div class="know-block-head" onclick="toggleKnowBlock('kb-prod')">
+            <div class="know-block-icon-plain" style="font-size:20px">🎯</div>
+            <div style="flex:1">
+              <div class="know-block-title">Producto y estrategia</div>
+              <div class="know-block-desc" style="display:none">Decisiones de producto, scope de features y criterios de aceptación</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="know-block-count">2 entradas</span>
+              <span class="know-state state-activa" style="font-size:10px">2 activas</span>
+              <span style="color:var(--txt-2);font-size:12px" class="kb-arrow">▶</span>
+            </div>
+          </div>
+          <div class="know-block-body">
+            <div class="know-block-item" style="border-left-color:var(--green)">
+              <div style="flex:1">
+                <div class="know-item-title">Scope Checkout v3 — sprint 12</div>
+                <div class="meta-row">
+                  <span class="know-state state-activa">● ACTIVA</span>
+                  <span class="tag tag-gray" style="font-size:10px">Decisión</span>
+                  <span class="meta">Sprint 12 · Nora</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Block 6: Sin clasificar -->
+        <div class="know-block" id="kb-uncat" style="border-style:dashed">
+          <div class="know-block-head" onclick="toggleKnowBlock('kb-uncat')">
+            <div class="know-block-icon-plain" style="font-size:20px;opacity:.5">❓</div>
+            <div style="flex:1">
+              <div class="know-block-title" style="color:var(--txt-1)">Sin clasificar</div>
+              <div class="know-block-desc" style="display:none">Entradas recientes pendientes de revisión por el LLM</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="know-block-count">1 entrada</span>
+              <span class="tag tag-purple" style="font-size:10px">🤖 Procesando</span>
+              <span style="color:var(--txt-2);font-size:12px" class="kb-arrow">▶</span>
+            </div>
+          </div>
+          <div class="know-block-body">
+            <div class="know-block-item" style="border-left-color:var(--purple);opacity:0.7">
+              <div style="flex:1">
+                <div class="know-item-title">Decisión de contraste WCAG — botones de acción</div>
+                <div class="meta-row">
+                  <span class="tag tag-purple" style="font-size:10px">🤖 Clasificando…</span>
+                  <span class="meta">hace 5 min · Elena</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;color:var(--txt-2);margin-top:12px;background:var(--bg-1);padding:8px 12px;border-radius:var(--radius)">
+          🔒 Solo Elena y Leo pueden cambiar el estado de las entradas. El resto puede proponer cambios. · 🤖 El LLM reclasifica automáticamente cuando detecta patrones nuevos.
+        </div>
+      </div>
+
+      <!-- VIEW: PREGUNTAR -->
+      <div id="know-view-preguntar" style="display:none">
+        <div class="card" style="border-color:var(--purple);margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span class="tag tag-purple">🤖 Respuesta RAG</span>
+            <span class="meta">Basada en 4 fuentes</span>
+          </div>
+          <div style="font-size:13px;line-height:1.6">
+            El border-radius de 6px fue decidido en el sprint 9 tras la retrospectiva de accesibilidad. Elena propuso 4px pero se acordó 6px para mejorar la percepción de los elementos interactivos en mobile.
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px">
+            <span class="frame-ref">📎 Decisión · Sprint 9</span>
+            <span class="frame-ref">📎 DS Tokens v1.2</span>
+            <span class="frame-ref">📎 Retro accesibilidad</span>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--txt-2);text-align:center">Usa ⌘K para hacer una nueva pregunta</div>
+      </div>
+
+      <!-- VIEW: RECIENTES -->
+      <div id="know-view-recientes" style="display:none">
+        <div class="card" style="padding:0;overflow:hidden">
+          <div class="know-item">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;width:100%">
+              <div>
+                <div class="know-item-title">Decisión de contraste WCAG — botones de acción</div>
+                <div class="meta-row"><span class="tag tag-purple" style="font-size:10px">🤖 Clasificando</span><span class="meta">hace 5 min · Elena</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="know-item">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;width:100%">
+              <div>
+                <div class="know-item-title">Tokens tipografía — escala móvil</div>
+                <div class="meta-row"><span class="know-state state-conflicto">● EN CONFLICTO</span><span class="tag tag-gray" style="font-size:10px">Decisión</span><span class="meta">Sprint 12 · Nora</span></div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+          </div>
+          <div class="know-item">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;width:100%">
+              <div>
+                <div class="know-item-title">Animaciones micro-interacción carrito — v2</div>
+                <div class="meta-row"><span class="know-state state-activa">● ACTIVA</span><span class="tag tag-gray" style="font-size:10px">Nota técnica</span><span class="meta">Sprint 11 · Priya</span></div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+          </div>
+          <div class="know-item">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;width:100%">
+              <div>
+                <div class="know-item-title">Border-radius · Tokens de forma</div>
+                <div class="meta-row"><span class="know-state state-activa">● ACTIVA</span><span class="tag tag-gray" style="font-size:10px">Decisión</span><span class="meta">Sprint 9 · Elena</span></div>
+              </div>
+              <button class="btn btn-secondary btn-xs">Ver</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- W4 — REVISIONES                                  -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="screen-revisiones" class="screen">
+      <div class="page-title">Revisiones</div>
+      <div class="page-sub">Handoffs enviados a revisión · cola y detalle</div>
+
+      <div class="filter-bar">
+        <span class="filter-chip active">Pendientes</span>
+        <span class="filter-chip">En revisión</span>
+        <span class="filter-chip">Aprobados</span>
+        <span class="filter-chip">Con cambios</span>
+      </div>
+
+      <div class="split-panel">
+        <div class="panel-left">
+          <div class="list-item selected" onclick="navigate('handoff')">
+            <div style="flex:1">
+              <div class="list-item-title">Checkout v3 <span class="tag tag-amber">En revisión</span></div>
+              <div class="list-item-meta">Marc Puig · hace 5 días · Leo solicitó cambios</div>
+            </div>
+          </div>
+          <div class="list-item" onclick="navigate('handoff')">
+            <div style="flex:1">
+              <div class="list-item-title">Dashboard v2 <span class="tag tag-blue">Pendiente</span></div>
+              <div class="list-item-meta">Tomás Silva · hace 1 día</div>
+            </div>
+          </div>
+          <div class="list-item">
+            <div style="flex:1">
+              <div class="list-item-title">Mobile Nav <span class="tag tag-green">Aprobado</span></div>
+              <div class="list-item-meta">Marc Puig · hace 10 días</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-right">
+          <div style="font-weight:700;font-size:16px;margin-bottom:4px">Checkout v3</div>
+          <div class="tag tag-amber">En revisión · 5 días</div>
+
+          <div class="meta-row" style="margin:12px 0">
+            <span>👤 Marc Puig → Elena García</span>
+            <span>📅 Sprint 12</span>
+          </div>
+
+          <div style="font-weight:600;font-size:12px;color:var(--txt-2);text-transform:uppercase;margin-bottom:8px">HISTORIAL DE ITERACIONES</div>
+          <div class="iter-list">
+            <div class="iter-row">
+              <div class="icirc done">✓</div>
+              <div class="iter-meta"><strong>v1 enviado</strong><br>Marc · hace 10 días · "Primera versión"</div>
+            </div>
+            <div class="iter-row">
+              <div class="icirc rej">✗</div>
+              <div class="iter-meta">
+                <strong>v1 rechazado</strong><br>Elena · hace 7 días
+                <div style="font-size:11px;color:var(--blue);cursor:pointer;margin-top:2px">Ver motivo del rechazo ▼</div>
+              </div>
+            </div>
+            <div class="iter-row">
+              <div class="icirc cur">●</div>
+              <div class="iter-meta"><strong>v2 en revisión</strong><br>Marc · hace 5 días · "Ajustados colores y animaciones"</div>
+            </div>
+          </div>
+
+          <hr class="divider">
+          <div id="rev-elena" data-role="elena">
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-primary btn-s">✓ Aprobar</button>
+              <button class="btn btn-secondary btn-s" onclick="navigate('handoff')">Ver handoff completo</button>
+            </div>
+          </div>
+          <div id="rev-marc" data-role="marc" style="display:none">
+            <div class="alert alert-amber" style="margin-top:0">
+              <span>⏳</span>
+              <div>Esperando revisión de Elena</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- W6 REVISED — HANDOFF                             -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="screen-handoff" class="screen">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <button class="btn btn-secondary btn-s" onclick="navigate('revisiones')">← Volver a revisiones</button>
+        <div class="page-title" style="margin:0">Handoff — Checkout v3</div>
+        <span class="tag tag-amber">En revisión</span>
+      </div>
+
+      <div class="two-col" style="gap:16px;align-items:start">
+        <!-- Left: spec + screenshot -->
+        <div>
+          <div class="card" style="padding:0;overflow:hidden;margin-bottom:12px">
+            <div class="screenshot-ph">
+              <span>🖼</span>
+              <div style="font-weight:500">Checkout v3 — Vista principal</div>
+              <div>Frame: Checkout · Captura estática</div>
+              <button class="btn btn-secondary btn-xs" style="margin-top:4px">Abrir en Figma ↗</button>
+            </div>
+            <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px">
+              <span class="frame-ref">📋 Frame: Payment step</span>
+              <span class="frame-ref">📋 Frame: Cart summary</span>
+              <span class="frame-ref">📋 Frame: Confirmation</span>
+            </div>
+          </div>
+
+          <!-- Checklist -->
+          <div class="card" style="margin-bottom:12px">
+            <div class="card-title">✅ Checklist de handoff</div>
+            <div class="checklist-item"><span class="check-icon">✅</span> Componentes en librería actualizada</div>
+            <div class="checklist-item"><span class="check-icon">✅</span> Tokens tipografía aplicados</div>
+            <div class="checklist-item"><span class="check-icon">✅</span> Estados hover / focus / disabled</div>
+            <div class="checklist-item"><span class="check-icon">⚠️</span> Animaciones — pendiente spec de Priya</div>
+            <div class="checklist-item"><span class="check-icon">⬜</span> Pruebas de accesibilidad (WCAG AA)</div>
+          </div>
+
+          <!-- Notes thread -->
+          <div class="card">
+            <div class="card-title">💬 Notas del handoff</div>
+            <div class="thread-msg" style="margin-bottom:10px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <div class="avatar av-m">M</div>
+                <strong>Marc Puig</strong>
+                <span class="meta">hace 5 días</span>
+              </div>
+              <div style="font-size:13px">Revisé el padding en <span class="frame-ref">📋 Cart summary</span> y <span class="frame-ref">📋 Payment step</span>. Los tokens están actualizados a DS v1.3.</div>
+            </div>
+            <div class="thread-msg">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <div class="avatar av-l">L</div>
+                <strong>Leo Torres</strong>
+                <span class="meta">hace 3 días</span>
+                <span class="tag tag-blue" style="font-size:10px">Validación técnica</span>
+              </div>
+              <div style="font-size:13px">Los tokens OK. Pero el transition-duration en <span class="frame-ref">📋 Payment step</span> parece demasiado lento para móvil — ¿150ms o 200ms?</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: iteration history + actions -->
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="card-title">🔄 Historial de iteraciones</div>
+            <div class="iter-list">
+              <div class="iter-row">
+                <div class="icirc done">✓</div>
+                <div class="iter-meta"><strong>v1 enviado</strong><br><span class="meta">Marc · hace 10 días</span></div>
+              </div>
+              <div class="iter-row">
+                <div class="icirc rej">✗</div>
+                <div class="iter-meta">
+                  <strong>v1 rechazado</strong><br><span class="meta">Elena · hace 7 días</span>
+                  <div style="font-size:12px;color:var(--txt-1);margin-top:4px;padding:8px;background:var(--red-lt);border-radius:4px">
+                    "Los colores del estado activo no cumplen ratio WCAG 4.5:1. Revisar y reenviar."
+                  </div>
+                </div>
+              </div>
+              <div class="iter-row">
+                <div class="icirc cur">●</div>
+                <div class="iter-meta"><strong>v2 — en revisión</strong><br><span class="meta">Marc · hace 5 días · "Ratio corregido a 5.1:1"</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Role-based action panel -->
+          <div id="hf-elena" data-role="elena">
+            <div class="card">
+              <div class="card-title">Acción de revisora</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <button class="btn btn-primary" style="width:100%">✓ Aprobar handoff</button>
+                <button class="btn btn-secondary" style="width:100%" onclick="document.getElementById('modal-cambios').classList.toggle('open')">✗ Solicitar cambios</button>
+              </div>
+              <div class="modal-wrap" id="modal-cambios">
+                <div style="font-weight:600;font-size:13px;margin-bottom:10px">Solicitar cambios</div>
+                <textarea style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;min-height:80px;resize:vertical;font-family:inherit" placeholder="Describe los cambios necesarios…"></textarea>
+                <div style="margin:8px 0;font-size:12px;color:var(--txt-2)">Frames afectados:</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+                  <span class="frame-ref" style="cursor:pointer">📋 Payment step</span>
+                  <span class="frame-ref" style="cursor:pointer">📋 Cart summary</span>
+                  <span class="frame-ref" style="cursor:pointer">+ Añadir frame</span>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-danger btn-s">Enviar solicitud</button>
+                  <button class="btn btn-secondary btn-s" onclick="document.getElementById('modal-cambios').classList.remove('open')">Cancelar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="hf-marc" data-role="marc" style="display:none">
+            <div class="card">
+              <div class="card-title">Estado de tu envío</div>
+              <div class="alert alert-amber" style="margin:0">
+                <span>⏳</span>
+                <div>En revisión por Elena · 5 días</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="hf-leo" data-role="leo" style="display:none">
+            <div class="card">
+              <div class="card-title">Validación técnica</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <button class="btn btn-primary" style="width:100%">✓ Validar viabilidad técnica</button>
+                <button class="btn btn-secondary" style="width:100%">⚠ Señalar problema técnico</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- W7 — SILENT CRIT                                 -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="screen-silent-crit" class="screen">
+      <div class="page-title">Silent Crit</div>
+      <div class="page-sub">Revisión asíncrona estructurada en 3 fases</div>
+
+      <div class="phase-bar">
+        <div class="phase-step done">① Observa</div>
+        <div class="phase-step done">② Pregunta</div>
+        <div class="phase-step active">③ Propone</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="card-title">📋 Sesión activa — Checkout v3</div>
+            <div class="meta-row">
+              <span>Presentado por: Marc Puig</span>
+              <span>Fase 3 — activa</span>
+            </div>
+            <hr class="divider">
+            <div class="card-title" style="margin-bottom:8px">Fase ① Observaciones (cerrada)</div>
+            <div class="thread-msg">
+              <div class="row" style="gap:8px;margin-bottom:4px"><div class="avatar av-l">L</div><strong>Leo</strong><span class="meta">hace 1h</span></div>
+              <div style="font-size:13px">El botón CTA destaca bien visualmente en desktop pero pierde peso en el viewport móvil</div>
+            </div>
+            <div class="thread-msg">
+              <div class="row" style="gap:8px;margin-bottom:4px"><div class="avatar av-e">E</div><strong>Elena</strong><span class="meta">hace 1h</span></div>
+              <div style="font-size:13px">La jerarquía del precio final vs desglose no está clara en la vista comprimida</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Fase ② Preguntas (cerrada)</div>
+            <div class="thread-msg">
+              <div class="row" style="gap:8px;margin-bottom:4px"><div class="avatar av-n">N</div><strong>Nora</strong><span class="meta">hace 45min</span></div>
+              <div style="font-size:13px">¿El estado de "pago procesando" tiene animación o es estático?</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">🎯 Fase ③ Propuestas — Abierta</div>
+            <div class="alert alert-blue" style="margin-bottom:12px">
+              <span>✍️</span>
+              <div>Tienes 18 minutos restantes para añadir propuestas</div>
+            </div>
+            <div class="thread-msg">
+              <div class="row" style="gap:8px;margin-bottom:4px"><div class="avatar av-p">P</div><strong>Priya</strong><span class="meta">hace 10min</span></div>
+              <div style="font-size:13px">Propongo aumentar el peso visual del total a 20px/700 y reducir el desglose a 13px/400</div>
+            </div>
+
+            <hr class="divider">
+
+            <textarea style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;min-height:100px;resize:vertical;font-family:inherit" placeholder="Añade tu propuesta…"></textarea>
+            <div style="display:flex;justify-content:flex-end;margin-top:8px">
+              <button class="btn btn-primary btn-s">Enviar propuesta</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <div class="card-title">Participantes</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                <div class="avatar av-e">E</div> Elena <span class="tag tag-green" style="font-size:10px">✓</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                <div class="avatar av-l">L</div> Leo <span class="tag tag-green" style="font-size:10px">✓</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                <div class="avatar av-n">N</div> Nora <span class="tag tag-green" style="font-size:10px">✓</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                <div class="avatar av-p">P</div> Priya <span class="tag tag-blue" style="font-size:10px">En progreso</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                <div class="avatar av-t">T</div> Tomás <span class="tag tag-gray" style="font-size:10px">Pendiente</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- W10 — ANÁLISIS/MÉTRICAS                          -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="screen-analisis" class="screen">
+      <div class="page-title">Análisis</div>
+      <div class="page-sub">Métricas del proceso de diseño por rol</div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="tab-bar" style="margin:0;background:none;border:none">
+          <button class="tab-btn active" onclick="setMetricRole(this,'Elena')">Elena</button>
+          <button class="tab-btn" onclick="setMetricRole(this,'Marc')">Marc</button>
+          <button class="tab-btn" onclick="setMetricRole(this,'Tomás')">Tomás</button>
+          <button class="tab-btn" onclick="setMetricRole(this,'Nora')">Nora</button>
+          <button class="tab-btn" onclick="setMetricRole(this,'Leo')">Leo</button>
+          <button class="tab-btn" onclick="setMetricRole(this,'Priya')">Priya</button>
+        </div>
+        <div style="display:flex;gap:6px">
+          <span class="filter-chip active" style="font-size:11px">Semanal</span>
+          <span class="filter-chip" style="font-size:11px">Mensual</span>
+          <span class="filter-chip" style="font-size:11px">Anual</span>
+        </div>
+      </div>
+
+      <div id="metrics-elena">
+        <div class="grid-3" style="margin-bottom:12px">
+          <div class="metric-card">
+            <div class="metric-type" style="color:var(--blue)">PROCESO</div>
+            <div class="metric-num">87%</div>
+            <div class="metric-label">Tasa resolución comentarios</div>
+            <div class="progress-wrap"><div class="progress-fill green" style="width:87%"></div></div>
+            <div class="metric-target">Objetivo: 85% ✅ · Media: 79%</div>
+            <button class="btn btn-secondary btn-xs" style="margin-top:8px">Editar objetivo</button>
+          </div>
+          <div class="metric-card">
+            <div class="metric-type" style="color:var(--amber)">CALIDAD</div>
+            <div class="metric-num">2.1</div>
+            <div class="metric-label">Iteraciones promedio por handoff</div>
+            <div class="progress-wrap"><div class="progress-fill amber" style="width:70%"></div></div>
+            <div class="metric-target">Objetivo: ≤2 ⚠ · Media: 2.4</div>
+            <button class="btn btn-secondary btn-xs" style="margin-top:8px">Editar objetivo</button>
+          </div>
+          <div class="metric-card">
+            <div class="metric-type" style="color:var(--purple)">CAPACIDAD</div>
+            <div class="metric-num">4</div>
+            <div class="metric-label">Decisiones sin validar</div>
+            <div class="metric-target">Objetivo: 0 · Actual: 4</div>
+            <a style="font-size:12px;color:var(--blue);cursor:pointer;display:block;margin-top:6px" onclick="navigate('revisiones')">→ Ver en Revisiones</a>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="metric-card">
+            <div class="metric-type" style="color:var(--green)">PERSONAL</div>
+            <div class="metric-num">92%</div>
+            <div class="metric-label">Tiempo de respuesta &lt;24h</div>
+            <div class="progress-wrap"><div class="progress-fill green" style="width:92%"></div></div>
+            <div class="metric-target">Objetivo: 90% ✅</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-type" style="color:var(--red)">VALOR</div>
+            <div class="metric-num">3</div>
+            <div class="metric-label">Informes publicados este mes</div>
+            <div class="metric-target">Objetivo: 4 · Pendiente: 1</div>
+            <a style="font-size:12px;color:var(--blue);cursor:pointer;display:block;margin-top:6px" onclick="navigate('informes')">→ Ver en Informes</a>
+          </div>
+          <div class="metric-card" style="background:var(--bg-1);border-style:dashed">
+            <div style="font-size:12px;color:var(--txt-2);text-align:center;padding:20px 0">
+              <div style="font-size:24px;margin-bottom:8px">+</div>
+              Añadir métrica personalizada
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="metrics-priya" style="display:none">
+        <div class="alert alert-blue" style="margin-bottom:16px">
+          <span>ℹ️</span>
+          <div>Vista de Priya: métricas desde la perspectiva de desarrollo. <strong>¿Le responde diseño a tiempo?</strong></div>
+        </div>
+        <div class="grid-3">
+          <div class="metric-card">
+            <div class="metric-type" style="color:var(--blue)">PROCESO</div>
+            <div class="metric-num">4h</div>
+            <div class="metric-label">Tiempo medio de respuesta de diseño</div>
+            <div class="metric-target">Objetivo: &lt;8h ✅</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-type" style="color:var(--amber)">CALIDAD</div>
+            <div class="metric-num">92%</div>
+            <div class="metric-label">Comentarios técnicos resueltos</div>
+            <div class="progress-wrap"><div class="progress-fill green" style="width:92%"></div></div>
+            <div class="metric-target">Objetivo: 90% ✅</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-type" style="color:var(--red)">CAPACIDAD</div>
+            <div class="metric-num">1</div>
+            <div class="metric-label">Dependencias externas pendientes</div>
+            <div class="metric-target">Objetivo: 0 · Bloqueante activo</div>
+            <a style="font-size:12px;color:var(--blue);cursor:pointer;display:block;margin-top:6px" onclick="navigate('comentarios')">→ Ver en Comentarios</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- W8 — INFORMES                                    -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="screen-informes" class="screen">
+      <div class="page-title">Informes</div>
+      <div class="page-sub">Narrativas estructuradas para stakeholders y retrospectivas</div>
+
+      <div style="display:flex;gap:8px;margin-bottom:20px">
+        <button class="btn btn-primary">+ Nuevo informe</button>
+        <button class="btn btn-secondary">📁 Ver todos</button>
+      </div>
+
+      <div style="font-weight:600;font-size:12px;color:var(--txt-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">PLANTILLAS</div>
+      <div class="grid-3" style="margin-bottom:24px">
+        <div class="report-card">
+          <div class="report-icon">📊</div>
+          <div style="font-weight:600;margin-bottom:4px">Retrospectiva de sprint</div>
+          <div style="font-size:12px;color:var(--txt-1)">Logros, bloqueos, decisiones clave y métricas del sprint</div>
+          <button class="btn btn-primary btn-s" style="margin-top:10px">Usar plantilla</button>
+        </div>
+        <div class="report-card">
+          <div class="report-icon">📈</div>
+          <div style="font-weight:600;margin-bottom:4px">Informe de proceso mensual</div>
+          <div style="font-size:12px;color:var(--txt-1)">Tendencias de velocidad, calidad y resolución de comentarios</div>
+          <button class="btn btn-primary btn-s" style="margin-top:10px">Usar plantilla</button>
+        </div>
+        <div class="report-card">
+          <div class="report-icon">🎯</div>
+          <div style="font-weight:600;margin-bottom:4px">Informe para dirección</div>
+          <div style="font-size:12px;color:var(--txt-1)">Resumen ejecutivo del estado del equipo de diseño</div>
+          <button class="btn btn-primary btn-s" style="margin-top:10px">Usar plantilla</button>
+        </div>
+      </div>
+
+      <div style="font-weight:600;font-size:12px;color:var(--txt-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">RECIENTES</div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="list-item">
+          <span style="font-size:20px">📊</span>
+          <div style="flex:1">
+            <div class="list-item-title">Retrospectiva Sprint 12</div>
+            <div class="list-item-meta">Nora Bello · Borrador · Actualizado hace 2h</div>
+          </div>
+          <button class="btn btn-secondary btn-xs">Abrir</button>
+        </div>
+        <div class="list-item">
+          <span style="font-size:20px">📈</span>
+          <div style="flex:1">
+            <div class="list-item-title">Proceso mensual — Mayo 2026</div>
+            <div class="list-item-meta">Elena García · Publicado · 2 jun 2026</div>
+          </div>
+          <button class="btn btn-secondary btn-xs">Ver</button>
+        </div>
+        <div class="list-item">
+          <span style="font-size:20px">🎯</span>
+          <div style="flex:1">
+            <div class="list-item-title">Informe Q1 para dirección</div>
+            <div class="list-item-meta">Nora Bello · Publicado · 15 mar 2026</div>
+          </div>
+          <button class="btn btn-secondary btn-xs">Ver</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════ -->
+    <!-- W9 — MODO PRESENTACIÓN                           -->
+    <!-- ════════════════════════════════════════════════ -->
+    <div id="screen-modo-presentacion" class="screen">
+      <div class="page-title">Modo Presentación</div>
+      <div class="page-sub">Flujo estructurado en 3 pasos para presentar diseños</div>
+
+      <div class="phase-bar" style="margin-bottom:20px">
+        <div class="phase-step active">① Contexto</div>
+        <div class="phase-step">② Diseño</div>
+        <div class="phase-step">③ Feedback</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="card-title">📋 Paso 1 — Contexto de la presentación</div>
+            <div style="margin-bottom:12px">
+              <label style="font-size:12px;color:var(--txt-2);display:block;margin-bottom:4px">Proyecto</label>
+              <select style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--bg-0)">
+                <option>Checkout v3</option>
+                <option>Mobile Nav</option>
+                <option>Dashboard Analytics</option>
+              </select>
+            </div>
+            <div style="margin-bottom:12px">
+              <label style="font-size:12px;color:var(--txt-2);display:block;margin-bottom:4px">Objetivo de la sesión</label>
+              <textarea style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;min-height:80px;resize:vertical;font-family:inherit" placeholder="¿Qué quieres conseguir con esta presentación?…">Obtener validación del flujo de pago y feedback sobre las micro-interacciones del carrito antes del sprint 13.</textarea>
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--txt-2);display:block;margin-bottom:4px">Audience</label>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <span class="tag tag-blue">Elena García ×</span>
+                <span class="tag tag-gray">Leo Torres ×</span>
+                <span class="tag tag-gray">Nora Bello ×</span>
+                <button class="btn btn-secondary btn-xs">+ Añadir</button>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end">
+            <button class="btn btn-primary">Siguiente — Diseño →</button>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-title">💡 Contexto recuperado — RAG</div>
+            <div class="alert alert-purple" style="background:var(--purple-lt);color:var(--purple);border-left-color:var(--purple);margin-bottom:12px">
+              <span>🤖</span>
+              <div>El Hub encontró contexto relevante para esta sesión</div>
+            </div>
+            <div style="font-size:13px;color:var(--txt-1);margin-bottom:12px">
+              <strong style="color:var(--txt-0)">Última iteración:</strong> Checkout v2 fue rechazado por ratio de contraste insuficiente (WCAG). Marc corrigió a 5.1:1 en v3.
+            </div>
+            <div style="font-size:13px;color:var(--txt-1);margin-bottom:12px">
+              <strong style="color:var(--txt-0)">Decisión vigente:</strong> Animaciones del carrito pendientes de spec de Priya. Bloqueo activo.
+            </div>
+            <div style="font-size:13px;color:var(--txt-1)">
+              <strong style="color:var(--txt-0)">Conocimiento activo:</strong> DS v1.3 tokens aplicados · Border-radius 6px confirmado.
+            </div>
+            <hr class="divider">
+            <div style="font-size:12px;color:var(--txt-2)">Fuentes: 3 entradas de conocimiento · 2 handoffs · 5 comentarios</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ════════════════════════════════════════════════════ -->
+<!--  ⌘K OVERLAY                                         -->
+<!-- ════════════════════════════════════════════════════ -->
+<div id="cmd-overlay" onclick="closeOnBackdrop(event)">
+  <div id="cmd-box">
+    <input id="cmd-input" type="text" placeholder="Pregunta algo… ej: ¿Por qué usamos 6px de border-radius?" autofocus>
+    <div class="cmd-results">
+      <div class="cmd-result-item focused" onclick="navigate('conocimiento');togglePreguntar()">
+        <span>🧠</span> ¿Por qué usamos border-radius de 6px? — Sprint 9
+      </div>
+      <div class="cmd-result-item" onclick="navigate('comentarios');togglePreguntar()">
+        <span>💬</span> ¿Qué comentarios hay sin resolver en Checkout v3?
+      </div>
+      <div class="cmd-result-item" onclick="navigate('analisis');togglePreguntar()">
+        <span>📊</span> ¿Cuántas iteraciones promedio tiene el equipo?
+      </div>
+      <div class="cmd-result-item" onclick="navigate('revisiones');togglePreguntar()">
+        <span>✅</span> ¿Qué handoffs están pendientes de aprobación?
+      </div>
+    </div>
+    <div class="cmd-footer">
+      <span>↵ Buscar</span>
+      <span>↑↓ Navegar</span>
+      <span>ESC Cerrar</span>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION PANEL -->
+<div id="notif-panel">
+  <div style="font-weight:600;font-size:13px;margin-bottom:10px;display:flex;justify-content:space-between">
+    Notificaciones
+    <span style="font-size:12px;color:var(--blue);cursor:pointer">Marcar todas</span>
+  </div>
+  <div class="notif-item notif-unread">
+    <strong>Bloqueo detectado</strong>
+    <div>Marc está esperando specs de animación de Priya · hace 2h</div>
+  </div>
+  <div class="notif-item notif-unread">
+    <strong>Tomás completó 3 comentarios</strong>
+    <div>Mobile Nav · hace 2h</div>
+  </div>
+  <div class="notif-item">
+    <strong>Handoff enviado</strong>
+    <div>Marc → Checkout v3 · hace 5 días</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!--  JAVASCRIPT                                         -->
+<!-- ════════════════════════════════════════════════════ -->
+<script>
+// ── Current state ──────────────────────────────────────
+let currentScreen = 'mi-trabajo';
+let currentRole = 'elena';
+
+// ── Navigation ─────────────────────────────────────────
+function navigate(screenId) {
+  // Hide all screens
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  // Show target
+  const target = document.getElementById('screen-' + screenId);
+  if (target) target.classList.add('active');
+
+  // Update nav active state
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navMap = {
+    'mi-trabajo': 0, 'comentarios': 1, 'comentario-detalle': 1,
+    'proyectos': 2, 'conocimiento': 3, 'revisiones': 4,
+    'handoff': 4, 'silent-crit': 4,
+    'analisis': 5, 'informes': 6, 'modo-presentacion': 6
+  };
+  const navItems = document.querySelectorAll('.nav-item');
+  if (navMap[screenId] !== undefined) {
+    navItems[navMap[screenId]].classList.add('active');
+  }
+
+  // Update breadcrumb
+  const names = {
+    'mi-trabajo': 'Mi trabajo',
+    'comentarios': 'Comentarios',
+    'comentario-detalle': 'Comentarios → Detalle',
+    'proyectos': 'Proyectos',
+    'conocimiento': 'Conocimiento',
+    'revisiones': 'Revisiones',
+    'handoff': 'Revisiones → Handoff',
+    'silent-crit': 'Silent Crit',
+    'analisis': 'Análisis',
+    'informes': 'Informes',
+    'modo-presentacion': 'Modo Presentación'
+  };
+  document.getElementById('breadcrumb-text').textContent = names[screenId] || screenId;
+
+  currentScreen = screenId;
+  // Close panels
+  document.getElementById('notif-panel').classList.remove('open');
+  // Scroll to top
+  document.getElementById('content').scrollTop = 0;
+}
+
+// ── Role switching ──────────────────────────────────────
+function setRole(role) {
+  currentRole = role;
+
+  // Update role buttons
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  // Show/hide role-conditional elements
+  document.querySelectorAll('[data-role]').forEach(el => {
+    el.style.display = el.dataset.role === role ? 'block' : 'none';
+  });
+
+  // Special: grid containers need display:grid not block
+  const gridEls = ['mt-' + role];
+  gridEls.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'block';
+  });
+
+  // Handoff panels
+  ['hf-elena','hf-marc','hf-leo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const hfEl = document.getElementById('hf-' + role);
+  if (hfEl) hfEl.style.display = 'block';
+
+  // Revisiones panels
+  ['rev-elena','rev-marc'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const revEl = document.getElementById('rev-' + role);
+  if (revEl) revEl.style.display = 'block';
+
+  // Metrics tabs
+  const metricsEl = document.getElementById('metrics-' + role);
+  if (metricsEl) {
+    document.getElementById('metrics-elena').style.display = 'none';
+    document.getElementById('metrics-priya').style.display = 'none';
+    // Show all tabs metric sections as none first
+    metricsEl.style.display = 'block';
+    // Sync tab button
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('active');
+      if (b.textContent === role.charAt(0).toUpperCase() + role.slice(1)) b.classList.add('active');
+    });
+  }
+}
+
+// ── Metric role tabs ────────────────────────────────────
+function setMetricRole(btn, roleName) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Show/hide metric sections
+  ['metrics-elena','metrics-priya'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const key = 'metrics-' + roleName.toLowerCase().replace('á','a').replace('ó','o');
+  const target = document.getElementById(key);
+  if (target) target.style.display = 'block';
+  else document.getElementById('metrics-elena').style.display = 'block'; // fallback
+}
+
+// ── ⌘K Preguntar ───────────────────────────────────────
+function togglePreguntar() {
+  const overlay = document.getElementById('cmd-overlay');
+  overlay.classList.toggle('open');
+  if (overlay.classList.contains('open')) {
+    document.getElementById('cmd-input').focus();
+  }
+}
+
+function closeOnBackdrop(e) {
+  if (e.target === document.getElementById('cmd-overlay')) togglePreguntar();
+}
+
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    togglePreguntar();
+  }
+  if (e.key === 'Escape') {
+    document.getElementById('cmd-overlay').classList.remove('open');
+    document.getElementById('notif-panel').classList.remove('open');
+  }
+});
+
+// ── Notifications ───────────────────────────────────────
+function toggleNotif() {
+  document.getElementById('notif-panel').classList.toggle('open');
+}
+
+// ── Cluster toggle ──────────────────────────────────────
+function toggleCluster(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ── Audit toggle ────────────────────────────────────────
+function toggleAudit(btn) {
+  btn.nextElementSibling.classList.toggle('open');
+}
+
+// ── Project detail ──────────────────────────────────────
+function showProject(name) {
+  document.querySelectorAll('.panel-left .list-item').forEach(i => i.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+// ── Select knowledge block (filter view) ─────────────────
+function selectBlock(id, btn) {
+  // Update index active state
+  document.querySelectorAll('.kb-index-item').forEach(i => i.classList.remove('active'));
+  btn.classList.add('active');
+
+  const allBlocks = document.querySelectorAll('.know-block');
+
+  if (id === 'todos') {
+    // Show all blocks, all collapsed
+    allBlocks.forEach(b => {
+      b.style.display = 'block';
+      const body = b.querySelector('.know-block-body');
+      const arrow = b.querySelector('.kb-arrow');
+      const desc = b.querySelector('.know-block-desc');
+      if (body) body.classList.remove('open');
+      if (arrow) arrow.textContent = '▶';
+      if (desc) desc.style.display = 'none';
+    });
+  } else {
+    // Hide all, show only selected — open it
+    allBlocks.forEach(b => {
+      b.style.display = 'none';
+      const body = b.querySelector('.know-block-body');
+      const arrow = b.querySelector('.kb-arrow');
+      const desc = b.querySelector('.know-block-desc');
+      if (body) body.classList.remove('open');
+      if (arrow) arrow.textContent = '▶';
+      if (desc) desc.style.display = 'none';
+    });
+    const target = document.getElementById(id);
+    if (target) {
+      target.style.display = 'block';
+      const body = target.querySelector('.know-block-body');
+      const arrow = target.querySelector('.kb-arrow');
+      const desc = target.querySelector('.know-block-desc');
+      if (body) body.classList.add('open');
+      if (arrow) arrow.textContent = '▼';
+      if (desc) desc.style.display = 'block';
+    }
+  }
+}
+
+// ── Knowledge block toggle ───────────────────────────────
+function toggleKnowBlock(id) {
+  const block = document.getElementById(id);
+  const body = block.querySelector('.know-block-body');
+  const arrow = block.querySelector('.kb-arrow');
+  const desc = block.querySelector('.know-block-desc');
+  body.classList.toggle('open');
+  const isOpen = body.classList.contains('open');
+  arrow.textContent = isOpen ? '▼' : '▶';
+  if (desc) desc.style.display = isOpen ? 'block' : 'none';
+}
+
+// ── Knowledge view switch ────────────────────────────────
+function switchKnowView(view, btn) {
+  document.querySelectorAll('#screen-conocimiento .filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('know-view-index').style.display = view === 'index' ? 'block' : 'none';
+  document.getElementById('know-view-preguntar').style.display = view === 'preguntar' ? 'block' : 'none';
+  document.getElementById('know-view-recientes').style.display = view === 'recientes' ? 'block' : 'none';
+}
+
+// ── Knowledge search ─────────────────────────────────────
+function filterKnowledge(query) {
+  if (!query) {
+    document.querySelectorAll('.know-block-item').forEach(i => i.style.display = '');
+    return;
+  }
+  const q = query.toLowerCase();
+  document.querySelectorAll('.know-block-item').forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(q) ? '' : 'none';
+  });
+  // Auto-open blocks with matches
+  document.querySelectorAll('.know-block').forEach(block => {
+    const visible = Array.from(block.querySelectorAll('.know-block-item')).some(i => i.style.display !== 'none');
+    const body = block.querySelector('.know-block-body');
+    const arrow = block.querySelector('.kb-arrow');
+    if (visible && body) { body.classList.add('open'); if(arrow) arrow.textContent = '▼'; }
+  });
+}
+
+// ── Initial state: show Elena role ──────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Show Elena's content by default
+  document.querySelectorAll('[data-role]').forEach(el => {
+    el.style.display = el.dataset.role === 'elena' ? 'block' : 'none';
+  });
+});
+
+// Also run immediately for non-DOMContentLoaded contexts
+(function() {
+  setTimeout(() => {
+    document.querySelectorAll('[data-role]').forEach(el => {
+      if (el.style.display === '') {
+        el.style.display = el.dataset.role === 'elena' ? 'block' : 'none';
+      }
+    });
+  }, 50);
+})();
+</script>
+</body>
+</html>
