@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Design Intelligence Hub — Prototipo v1</title>
+<title>Design Intelligence Hub — Prototipo v1.3</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <style>
 /* ── TOKENS ─────────────────────────────────────────── */
 :root {
@@ -605,6 +607,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
 .empty-state .empty-icon { font-size: 36px; margin-bottom: 12px; }
 .empty-state p { font-size: 13px; }
 
+/* Knowledge block icon (plain, no background) */
+.know-block-icon-plain {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
 /* Knowledge blocks */
 .know-block {
   background: var(--bg-0);
@@ -619,12 +630,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font
   cursor: pointer;
 }
 .know-block-head:hover { background: var(--bg-1); }
-.know-block-icon {
-  width: 36px; height: 36px;
-  border-radius: var(--radius);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; flex-shrink: 0;
-}
+/* .know-block-icon removed — using .know-block-icon-plain */
 .know-block-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
 .know-block-desc { font-size: 12px; color: var(--txt-2); }
 .know-block-count { font-size: 12px; color: var(--txt-2); white-space: nowrap; }
